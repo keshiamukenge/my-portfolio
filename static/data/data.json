@@ -1,0 +1,77 @@
+{
+	"essentials": {
+		"header": {
+			"homepage": {
+				"url": "/",
+				"label": "KM"
+			},
+			"about": {
+				"url": "/about",
+				"label": "about"
+			}
+		},
+		"footer": {
+			"links": {
+				"github": {
+					"url": "#",
+					"label": "GitHub"
+				},
+				"linkedin": {
+					"url": "#",
+					"label": "Linkedin"
+				}
+			},
+			"role": "creative developer"
+		}
+	},
+	"projects": [
+		{
+			"id": 0,
+			"class": "project0",
+			"title": "portfolio camille gubian",
+			"route": "/project/portfolio-camille-gubian",
+			"image": {
+				"url": "images/cam-portfolio-project.jpeg",
+				"class": "img0"
+			},
+			"border": false,
+			"value": {
+				"class": "project-title-0",
+				"revealTitle": true,
+				"revealPagination": true
+			}
+		},
+		{
+			"id": 1,
+			"class": "project1",
+			"title": "soul funk factory",
+			"route": "/project/soul-funk-factory",
+			"image": {
+				"url": "images/sff-project.jpeg",
+				"class": "img1"
+			},
+			"border": true,
+			"value": {
+				"class": "project-title-1",
+				"revealTitle": false,
+				"revealPagination": false
+			}
+		},
+		{
+			"id": 2,
+			"class": "project2",
+			"title": "out of school",
+			"route": "/project/out-of-school",
+			"image": {
+				"url": "images/out-of-school-project.jpeg",
+				"class": "img2"
+			},
+			"border": false,
+			"value": {
+				"class": "project-title-2",
+				"revealTitle": false,
+				"revealPagination": false
+			}
+		}
+	]
+}

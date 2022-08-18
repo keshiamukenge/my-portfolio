@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Spinnaker&display=swap');
+@import './variables.scss';
+
+@font-face {
+  font-family: 'PS-Kaldera';
+  src: local('PS-Kaldera');
+  src: url(~assets/fonts/PS-Kaldera-Regular.otf) format('otf');
+}
+
+html {
+  body {
+    width: 100vw;
+    height: 100vh;
+    background-color: $black-color;
+    overflow: hidden;
+
+    a {
+      display: block;
+      text-decoration: none;
+    }
+
+    h1 {
+      font-family: $title-font;
+    }
+
+    h2 {
+      font-family: $title-font;
+      color: $white-color;
+      font-size: 4rem;
+    }
+
+    h3 {
+      font-family: $body-font;
+    }
+  }
+}
