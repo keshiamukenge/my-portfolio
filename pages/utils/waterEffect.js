@@ -7,6 +7,7 @@ const wavesOptions = {
 	maxAge: 50,
 	width: size,
 	height: size,
+	last: null,
 }
 
 export function initTexture({ width, height }) {
@@ -25,27 +26,61 @@ export function clear({ ctx, canvas }) {
 }
 
 export function addPoint({ point }) {
-	wavesOptions.points = [
+	let force = 0;
+	let vx = 0;
+  let vy = 0;
+
+  const last = wavesOptions.last;
+
+  if (last) {
+    const relativeX = point.x - last.x;
+    const relativeY = point.y - last.y;
+    // Distance formula
+    const distanceSquared = relativeX * relativeX + relativeY * relativeY;
+    const distance = Math.sqrt(distanceSquared);
+    // Calculate Unit Vector
+    vx = relativeX / distance;
+    vy = relativeY / distance;
+
+    force = Math.min(distanceSquared * 10000, 1);
+  }
+
+  wavesOptions.last = {
+    x: point.x,
+    y: point.y
+  };
+
+  wavesOptions.points = [
 		...wavesOptions.points,
 		{
 			x: point.x,
 			y: point.y,
-			age: 0
+			age: 0,
+			force,
+			vx,
+			vy,
 		}
 	];
 }
 
 export function updatePoints() {
 	clear({ ctx: document.querySelector('canvas#WaterTexture').getContext("2d"), canvas: document.querySelector('canvas#WaterTexture') });
-	wavesOptions.points.forEach((point, i) => {
-		point.age += 1;
-		if (point.age > wavesOptions.maxAge) {
-			wavesOptions.points.splice(i, 1);
-		}
-	});
+  const agePart = 1 / wavesOptions.maxAge;
+  wavesOptions.points.forEach((point, i) => {
+    const slowAsOlder = 1 - point.age / wavesOptions.maxAge;
+    const force = point.force * agePart * slowAsOlder;
+    point.x += point.vx * force;
+    point.y += point.vy * force;
+    point.age += 1;
+
+    if (point.age > wavesOptions.maxAge) {
+      wavesOptions.points.splice(i, 1);
+    }
+  });
+  
 	wavesOptions.points.forEach(point => {
-		drawPoint(point);
-	});
+    drawPoint(point);
+  });
 }
 
 export function drawPoint(point) {
