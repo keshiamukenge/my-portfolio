@@ -59,7 +59,7 @@ export default {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: ['@nuxtjs/axios'],
+  modules: ['@nuxtjs/axios',],
   axios: {
     proxy: true,
     mode: 'no-cors',
