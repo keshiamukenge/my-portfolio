@@ -68,11 +68,13 @@
 // import gsap from 'gsap'
 import { mapMutations } from 'vuex'
 import * as THREE from 'three'
+import { EffectPass, EffectComposer, RenderPass } from 'postprocessing'
 import Title from '../shared/vue-lib/src/stories/components/Title/Title.vue'
 
 import { fonts, colors } from '../theme'
 import { Header, Footer } from '../components/Essentials'
-import { initTexture, addPoint, updatePoints } from './utils/waterEffect'
+import { initTexture, addPoint, updatePoints } from './utils/touchTexture'
+import waterEffect from './utils/waterEffect'
 import {
   ContainerProjects,
   ContainerProject,
@@ -133,7 +135,6 @@ export default {
 
     this.setCanvas()
     this.init()
-    initTexture({ width: this.sizes.width, height: this.sizes.height })
     this.update()
   },
   methods: {
@@ -145,12 +146,12 @@ export default {
     switchProject() {},
     getMousePosition() {
       window.addEventListener('mousemove', (event) => {
-        this.point = {
+        this.mousePosition = {
           x: event.clientX / window.innerWidth,
           y: event.clientY / window.innerHeight,
         }
 
-        addPoint({ point: this.point })
+        addPoint({ point: this.mousePosition })
       })
     },
     setActivedProject(direction) {
@@ -179,11 +180,12 @@ export default {
       this.canvas.style.height = window.innerHeight
     },
     init() {
+      this.waterTexture = initTexture()
+      this.clock = new THREE.Clock()
       this.sizes = {
         width: window.innerWidth,
         height: window.innerHeight,
       }
-      this.position = new THREE.Vector3(0, 0, 0)
       this.camera = new THREE.PerspectiveCamera(
         70,
         this.sizes.width / this.sizes.height,
@@ -191,19 +193,26 @@ export default {
         1000
       )
       this.scene = new THREE.Scene()
+      this.clock = new THREE.Clock()
       this.renderer = new THREE.WebGLRenderer({
         alpha: true,
+        antialias: false,
       })
       this.renderer.setSize(this.sizes.width, this.sizes.height)
+
+      this.composer = new EffectComposer(this.renderer)
+
       document.body.appendChild(this.renderer.domElement)
       this.geometry = new THREE.PlaneBufferGeometry(
         this.imagesSizes.width,
         this.imagesSizes.height,
-        8,
-        8
+        50,
+        50
       )
       this.material = new THREE.ShaderMaterial({
         side: THREE.DoubleSide,
+        depthTest: false,
+        transparent: true,
         vertexShader: `
         varying vec2 vUv;
 
@@ -211,8 +220,7 @@ export default {
             vUv = uv;
 
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-          `,
+          }`,
         fragmentShader: `
           uniform sampler2D uTexture;
 
@@ -237,18 +245,32 @@ export default {
       this.plane = new THREE.Mesh(this.geometry, this.material)
       this.scene.add(this.plane)
       this.camera.position.z = 600
+      this.initComposer()
     },
     onResize() {
-      window.addEventListener('resize', () => {
-        this.canvas.style.width = window.innerWidth
-        this.canvas.style.height = window.innerHeight
-      })
+      this.camera.aspect = this.sizes.width / this.sizes.height
+      this.camera.updateProjectionMatrix()
+
+      this.composer.setSize(this.sizes.width, this.sizes.height)
+      this.geometry.width = this.imagesSizes.width
+      this.geometry.height = this.imagesSizes.height
     },
     update() {
       requestAnimationFrame(this.update)
       updatePoints()
       this.onResize()
-      this.renderer.render(this.scene, this.camera)
+      this.composer.render(this.clock.getDelta())
+    },
+
+    // SETUP POST PROCESSING
+    initComposer() {
+      const renderPass = new RenderPass(this.scene, this.camera)
+      this.waterEffect = waterEffect({ texture: this.waterTexture })
+      const waterPass = new EffectPass(this.camera, this.waterEffect)
+      waterPass.renderToScreen = true
+      renderPass.renderToScreen = false
+      this.composer.addPass(renderPass)
+      this.composer.addPass(waterPass)
     },
   },
 }
