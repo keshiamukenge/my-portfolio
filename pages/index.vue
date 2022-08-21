@@ -2,19 +2,17 @@
   <div>
     <Header />
     <ContainerProjects>
-      <SwitchButton
-        top="13%"
-        @click="
-          setActivedProject('previous')
-          switchProject()
-        "
+      <SwitchButton top="13%" @click="setActivedProject('previous')"
         >Previous</SwitchButton
       >
       <NuxtLink :to="'/project/' + activeId">
         <ContainerProject
           v-for="project in $store.state.projectsData"
           :key="project.id"
-          @click="SET_SELECTED_PROJECT({ id: activeId })"
+          @click="
+            SET_SELECTED_PROJECT({ id: activeId })
+            switchProject()
+          "
         >
           <ImageElement ref="images" :src="project.image.url" />
           <ProjectTitle>
@@ -51,12 +49,7 @@
           </ContainerPagination>
         </ContainerProject>
       </NuxtLink>
-      <SwitchButton
-        top="87%"
-        @click="
-          setActivedProject('next')
-          switchProject()
-        "
+      <SwitchButton top="87%" @click="setActivedProject('next')"
         >Next</SwitchButton
       >
     </ContainerProjects>
@@ -65,7 +58,7 @@
 </template>
 
 <script>
-// import gsap from 'gsap'
+import gsap from 'gsap'
 import { mapMutations } from 'vuex'
 import * as THREE from 'three'
 import { EffectPass, EffectComposer, RenderPass } from 'postprocessing'
@@ -111,6 +104,10 @@ export default {
         height: 0,
       },
       activeId: 0,
+      size: {
+        width: 0,
+        height: 0,
+      },
     }
   },
   watch: {
@@ -131,10 +128,10 @@ export default {
     this.imagesSizes.width = this.$refs.images[0].$el.clientWidth
     this.imagesSizes.height = this.$refs.images[0].$el.clientHeight
 
-    this.getMousePosition()
+    this.setMousePosition()
 
     this.setCanvas()
-    this.init()
+    this.initWebgl()
     this.update()
   },
   methods: {
@@ -143,8 +140,7 @@ export default {
       'SET_ACTIVED_PROJECT',
       'SET_PREVIOUS_ACTIVE_PROJECT',
     ]),
-    switchProject() {},
-    getMousePosition() {
+    setMousePosition() {
       window.addEventListener('mousemove', (event) => {
         this.mousePosition = {
           x: event.clientX / window.innerWidth,
@@ -172,6 +168,13 @@ export default {
       this.SET_ACTIVED_PROJECT({ id: this.activeId })
     },
 
+    switchProject() {
+      gsap.to(this.material, {
+        opacity: 0,
+        duration: 3,
+      })
+    },
+
     // SETUP 3D SCENE
     setCanvas() {
       this.canvas = document.createElement('canvas')
@@ -179,30 +182,34 @@ export default {
       this.canvas.style.width = window.innerWidth
       this.canvas.style.height = window.innerHeight
     },
-    init() {
+    initWebgl() {
       this.waterTexture = initTexture()
       this.clock = new THREE.Clock()
-      this.sizes = {
+
+      this.size = {
         width: window.innerWidth,
         height: window.innerHeight,
       }
       this.camera = new THREE.PerspectiveCamera(
         70,
-        this.sizes.width / this.sizes.height,
+        this.size.width / this.size.height,
         0.1,
         1000
       )
+      this.camera.position.z = 600
       this.scene = new THREE.Scene()
-      this.clock = new THREE.Clock()
+
       this.renderer = new THREE.WebGLRenderer({
         alpha: true,
         antialias: false,
       })
-      this.renderer.setSize(this.sizes.width, this.sizes.height)
+      this.renderer.setSize(this.size.width, this.size.height)
 
       this.composer = new EffectComposer(this.renderer)
 
       document.body.appendChild(this.renderer.domElement)
+
+      // setup plane
       this.geometry = new THREE.PlaneBufferGeometry(
         this.imagesSizes.width,
         this.imagesSizes.height,
@@ -231,9 +238,6 @@ export default {
             gl_FragColor = vec4(texture, 1.0);
           }`,
         uniforms: {
-          uMouse: {
-            value: this.mousePosition,
-          },
           uTexture: {
             value: new THREE.TextureLoader().load(
               this.$store.state.projectsData[this.activeId].image.url
@@ -244,16 +248,22 @@ export default {
       this.material.uniformsNeedUpdate = true
       this.plane = new THREE.Mesh(this.geometry, this.material)
       this.scene.add(this.plane)
-      this.camera.position.z = 600
+
+      // setup post-processing
       this.initComposer()
     },
     onResize() {
-      this.camera.aspect = this.sizes.width / this.sizes.height
-      this.camera.updateProjectionMatrix()
+      window.addEventListener('resize', () => {
+        this.size.width = window.innerWidth
+        this.size.height = window.innerHeight
 
-      this.composer.setSize(this.sizes.width, this.sizes.height)
-      this.geometry.width = this.imagesSizes.width
-      this.geometry.height = this.imagesSizes.height
+        this.camera.aspect = this.size.width / this.size.height
+        this.camera.updateProjectionMatrix()
+
+        this.composer.setSize(this.size.width, this.size.height)
+        this.geometry.width = this.imagesSizes.width
+        this.geometry.height = this.imagesSizes.height
+      })
     },
     update() {
       requestAnimationFrame(this.update)

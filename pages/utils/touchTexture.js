@@ -9,13 +9,13 @@ const easeOutQuad = (t, b, c, d) => {
   return -c * t * (t - 2) + b;
 };
 
-const size = 64;
+const size = 50;
 
 const wavesOptions = {
 	size,
-	radius: size * 0.6,
+	radius: size * 0.9,
 	points: [],
-	maxAge: 64,
+	maxAge: 90,
 	width: window.innerWidth,
 	height: window.innerHeight,
 	last: null,
@@ -41,7 +41,7 @@ export function initTexture() {
 	return waterTexture;
 }
 
-export function clear() {
+function clear() {
 	ctx.fillStyle = "black";
 	ctx?.fillRect(0, 0, canvas.width, canvas.height);
 }
@@ -63,7 +63,7 @@ export function addPoint({ point }) {
     vx = relativeX / distance;
     vy = relativeY / distance;
 
-    force = Math.min(distanceSquared * 1000, 1);
+    force = Math.min(distanceSquared * 10000, 1);
   }
 
   wavesOptions.last = {
@@ -106,12 +106,13 @@ export function updatePoints() {
 	waterTexture.needsUpdate = true;
 }
 
-export function drawPoint(point) {
+function drawPoint(point) {
 	// Convert normalized position into canvas coordinates
 	const position = {
 		x: point.x * wavesOptions.width,
-		y: (1 - point.y) * wavesOptions.height
+		y: point.y * wavesOptions.height
 	};
+	const radius = wavesOptions.radius;
 
 	let intensity = 1;
 
@@ -126,19 +127,18 @@ export function drawPoint(point) {
 		);
 	}
 	intensity *= point.force;
-	const radius = wavesOptions.radius;
 
-	const color = `${((point.vx + 1) / 2) * 255}, ${
-	((point.vy + 1) / 2) * 255
-	}, ${intensity * 255}`;
+	// const color = `${((point.vx + 1) / 2) * 255}, ${
+	// ((point.vy + 1) / 2) * 255
+	// }, ${intensity * 255}`;
 
-	// const red = ((point.vx + 1) / 2) * 255;
-	// const green = ((point.vy + 1) / 2) * 255;
-	// // B = Unit vector
-	// const blue = intensity * 255;
-	// const color = `${red}, ${green}, ${blue}`;
+	const red = ((point.vx + 1) / 2) * 255;
+	const green = ((point.vy + 1) / 2) * 255;
+	// B = Unit vector
+	const blue = intensity * 255;
+	const color = `${red}, ${green}, ${blue}`;
 
-	const offset = size * 5;
+	const offset = wavesOptions.width * 5;
 	// 1. Give the shadow a high offset.
 	ctx.shadowOffsetX = offset;
 	ctx.shadowOffsetY = offset;
@@ -152,4 +152,4 @@ export function drawPoint(point) {
 	ctx.fill();
 }
 
-export default { initTexture, clear, addPoint, updatePoints, drawPoint };
+export default { initTexture, addPoint, updatePoints };
