@@ -10,9 +10,12 @@
 html {
   body {
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+    height: fit-content;
     background-color: $black-color;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    color: $white-color;
 
     a {
       display: block;
@@ -31,6 +34,15 @@ html {
 
     h3 {
       font-family: $body-font;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      opacity: 0.5;
+    }
+
+    p {
+      font-family: $body-font;
+      font-size: 1rem;
+      line-height: 25px;
     }
   }
   canvas {

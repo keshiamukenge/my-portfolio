@@ -12,9 +12,6 @@ const fragment = `
   	float intensity = tex.b;
     uv.x += vx * 0.2 * intensity;
     uv.y += vy * 0.2  *intensity;
-    // uv.xy *= 1. - 0.5 * smoothstep( 0., 1., intensity);
-    // uv.x +=  0.2 * intensity;
-    // uv.y +=  0.2  *intensity;
   }
 `;
 

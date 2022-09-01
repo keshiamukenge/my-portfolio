@@ -9,13 +9,13 @@ const easeOutQuad = (t, b, c, d) => {
   return -c * t * (t - 2) + b;
 };
 
-const size = 50;
+// const size = 50;
 
 const wavesOptions = {
-	size,
-	radius: size * 0.9,
+	// size,
+	// radius: size * 0.9,
+	// maxAge: 30,
 	points: [],
-	maxAge: 90,
 	width: window.innerWidth,
 	height: window.innerHeight,
 	last: null,
@@ -24,6 +24,14 @@ const wavesOptions = {
 let canvas = null;
 let ctx = null;
 let waterTexture = null;
+
+export function setTouchTextureValue({ size, radius, maxAge }) {
+	return {
+		size,
+		radius,
+		maxAge,
+	}
+}
 
 export function initTexture() {
 	canvas = document.createElement("canvas");
@@ -84,43 +92,42 @@ export function addPoint({ point }) {
 	];
 }
 
-export function updatePoints() {
+export function updatePoints({ maxAge, radius }) {
 	clear();
-  const speed = 1 / wavesOptions.maxAge;
+  const speed = 1 / maxAge * 0.3;
   wavesOptions.points.forEach((point, i) => {
-    const slowAsOlder = 1 - point.age / wavesOptions.maxAge;
+    const slowAsOlder = 1 - point.age / maxAge;
     const force = point.force * speed * slowAsOlder;
     point.x += point.vx * force;
     point.y += point.vy * force;
     point.age += 1;
 
-    if (point.age > wavesOptions.maxAge) {
+    if (point.age > maxAge) {
       wavesOptions.points.splice(i, 1);
     }
   });
   
 	wavesOptions.points.forEach(point => {
-    drawPoint(point);
+    drawPoint({ point, radius, maxAge });
   });
 
 	waterTexture.needsUpdate = true;
 }
 
-function drawPoint(point) {
+function drawPoint({ point, radius, maxAge }) {
 	// Convert normalized position into canvas coordinates
 	const position = {
 		x: point.x * wavesOptions.width,
 		y: point.y * wavesOptions.height
 	};
-	const radius = wavesOptions.radius;
 
 	let intensity = 1;
 
-	if (point.age < wavesOptions.maxAge * 0.3) {
-		intensity = easeOutSine(point.age / (wavesOptions.maxAge * 0.3), 0, 1, 1);
+	if (point.age < maxAge * 0.3) {
+		intensity = easeOutSine(point.age / (maxAge), 0, 1, 1);
 	} else {
 		intensity = easeOutQuad(
-			1 - (point.age - wavesOptions.maxAge * 0.3) / (wavesOptions.maxAge * 0.7),
+			1 - (point.age - maxAge * 0.3) / (maxAge * 0.7),
 			0,
 			1,
 			1
@@ -128,17 +135,13 @@ function drawPoint(point) {
 	}
 	intensity *= point.force;
 
-	// const color = `${((point.vx + 1) / 2) * 255}, ${
-	// ((point.vy + 1) / 2) * 255
-	// }, ${intensity * 255}`;
-
 	const red = ((point.vx + 1) / 2) * 255;
 	const green = ((point.vy + 1) / 2) * 255;
 	// B = Unit vector
 	const blue = intensity * 255;
 	const color = `${red}, ${green}, ${blue}`;
 
-	const offset = wavesOptions.width * 5;
+	const offset = wavesOptions.width * 1;
 	// 1. Give the shadow a high offset.
 	ctx.shadowOffsetX = offset;
 	ctx.shadowOffsetY = offset;
@@ -152,4 +155,4 @@ function drawPoint(point) {
 	ctx.fill();
 }
 
-export default { initTexture, addPoint, updatePoints };
+export default { initTexture, addPoint, updatePoints, setTouchTextureValue };

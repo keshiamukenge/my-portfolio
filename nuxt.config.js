@@ -24,28 +24,12 @@ export default {
     '~/assets/scss/main.scss',
   ],
 
+  // loading: '~/components/Loader/Loader.vue',
+  loading: false,
+
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [],
 
-  router: {
-    routes: [
-      {
-        name: 'home',
-        path: '/',
-        component: 'pages/index.vue'
-      },
-      {
-        name: 'about',
-        path: '/about',
-        component: 'pages/index.vue'
-      },
-      {
-        type: 'project',
-        path: '/project/:uid',
-        component: 'pages/Project/_project.vue'
-      }
-    ]
-  },
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,

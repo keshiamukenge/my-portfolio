@@ -4,6 +4,7 @@ export const state = {
 	headerData: {},
 	footerData: {},
   projectsData: [],
+  defaultId: 0,
   selectedProject: {},
   activeProject: {},
   previousActiveProject: null,
@@ -16,7 +17,10 @@ export const mutations = {
   },
   SET_FOOTER_DATA(state, footerData) {
     state.footerData = footerData
-  }, 
+  },
+  SET_PROJECTS_DATA(state, projectsData) {
+    state.projectsData = projectsData
+  },
   SET_SELECTED_PROJECT(state, { id }) {
     state.selectedProject = state.projectsData[id]
   },
@@ -30,8 +34,34 @@ export const mutations = {
     state.previousActiveProject.value.revealTitle = false
     state.previousActiveProject.value.revealPagination = false
   },
-  SET_PROJECTS_DATA(state, projectsData) {
-    state.projectsData = projectsData
+  SET_DISAPPEAR_TITLE(state) {
+    if(state?.selectedProject) {
+      state.selectedProject.value.revealTitle = false
+    } else {
+      state.projectsData[0].value.revealTitle = false
+    }
+  },
+  SET_REVEAL_ABOUT_FIRST_TEXT(state, { reveal }) {
+    state.revealAbout.firstText = reveal
+  },
+  SET_BODY_OVERFLOW() {
+    const path = window.location.pathname
+    
+    if(path.includes('project')) {
+      document.body.style.overflowY = 'scroll'
+    } else {
+      document.body.style.overflowY = 'hidden'
+    }
+  },
+  SET_SELECTED_PROJECT_WITH_ROUTER() {
+    const currentPath = window.location.pathname.split('/')[2]
+    const projects = state.projectsData
+    
+    projects.forEach(project => {
+      if(project.route === currentPath) {
+        state.selectedProject = project
+      }
+    })
   },
   SET_ERROR(state, error) {
     state.error = error

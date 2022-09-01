@@ -8,7 +8,7 @@ const footerLinkProps = {
 
 const containerStyle = () => {
 	return `
-		widht: 100vw;
+		width: 100vw;
 		height: 50px;
 		padding: 1rem 50px;
 		display: flexx;
