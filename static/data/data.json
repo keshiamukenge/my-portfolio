@@ -1,163 +1,181 @@
 {
-	"essentials": {
-		"header": {
-			"homepage": {
-				"url": "/",
-				"label": "KM"
-			},
-			"about": {
-				"url": "/about",
-				"label": "about"
-			}
-		},
-		"footer": {
-			"links": {
-				"github": {
-					"url": "#",
-					"label": "GitHub"
-				},
-				"linkedin": {
-					"url": "#",
-					"label": "Linkedin"
-				}
-			},
-			"role": "creative developer"
-		}
-	},
-	"projects": [
-		{
-			"id": 0,
-			"class": "project0",
-			"title": "portfolio camille gubian",
-			"type": "portfolio",
-			"route": "portfolio-camille-gubian",
-			"image": {
-				"url": "images/cam-portfolio-project.jpeg",
-				"class": "img0",
-				"width": 1280,
-				"height": 1024
-			},
-			"role": [
-				{
-					"id": 0,
-					"label": "developmnent"
-				}
-			],
-			"parts": {
-				"date": {
-					"title": "date",
-					"content": "Juin 2022"
-				},
-				"client": {
-					"title": "client",
-					"content": "Camille GUBIAN"
-				},
-				"technologies": {
-					"label": "technologies",
-					"content": "VUEJS / CMS - PRISMIC"
-				},
-				"description": {
-					"title": "description",
-					"content": "This is a portfolio website for Camille Gubian. It is a responsive website that is fully functional and fully responsive. It is built with HTML5, CSS3, and JavaScript. The website is fully responsive and works on all devices."
-				}
-			},
-			"value": {
-				"class": "project-title-0",
-				"revealTitle": false,
-				"revealPagination": false
-			}
-		},
-		{
-			"id": 1,
-			"class": "project1",
-			"title": "soul funk factory",
-			"type": "music band",
-			"route": "soul-funk-factory",
-			"image": {
-				"url": "images/sff-project.jpeg",
-				"class": "img1",
-				"width": 2857,
-				"height": 4000
-			},
-			"role": [
-				{
-					"id": 0,
-					"label": "developmnent"
-				},
-				{
-					"id": 1,
-					"label": "design"
-				}
-			],
-			"parts": {
-				"date": {
-					"title": "date",
-					"content": "Juillet 2022"
-				},
-				"client": {
-					"title": "client",
-					"content": "Soul Funk Factory - Music band"
-				},
-				"technologies": {
-					"label": "technologies",
-					"content": "VUEJS / CMS - PRISMIC"
-				},
-				"description": {
-					"title": "description",
-					"content": "This is a portfolio website for Soul Funk Factory. It is a responsive website that is fully functional and fully responsive. It is built with HTML5, CSS3, and JavaScript. The website is fully responsive and works on all devices."
-				}
-			},
-			"value": {
-				"class": "project-title-1",
-				"revealTitle": false,
-				"revealPagination": false
-			}
-		},
-		{
-			"id": 2,
-			"class": "project2",
-			"title": "out of school",
-			"type": "culture",
-			"route": "out-of-school",
-			"image": {
-				"url": "images/out-of-school-project.jpeg",
-				"class": "img2",
-				"width": 6288,
-				"height": 3536
-			},
-			"role": [
-				{
-					"id": 0,
-					"label": "developmnent"
-				},
-				{
-					"id": 1,
-					"label": "design"
-				}
-			],
-			"parts": {
-				"date": {
-					"title": "date",
-					"content": "April - Mai 2022"
-				},
-				"client": {
-					"title": "client",
-					"content": "School project"
-				},
-				"technologies": {
-					"label": "technologies",
-					"content": "REACTJS / CMS - PRISMIC"
-				},
-				"description": {
-					"title": "description",
-					"content": "This is a school project."
-				}
-			},
-			"value": {
-				"class": "project-title-2",
-				"revealTitle": false,
-				"revealPagination": false
-			}
-		}
-	]
+  "essentials": {
+    "header": {
+      "homepage": {
+        "url": "/",
+        "label": "KM"
+      },
+      "about": {
+        "url": "/about",
+        "label": "about"
+      }
+    },
+    "footer": {
+      "links": {
+        "github": {
+          "url": "#",
+          "label": "GitHub"
+        },
+        "linkedin": {
+          "url": "#",
+          "label": "Linkedin"
+        }
+      },
+      "role": "creative developer"
+    }
+  },
+  "projects": [
+    {
+      "id": 0,
+      "class": "project0",
+      "title": "portfolio camille gubian",
+      "type": "portfolio",
+      "route": "portfolio-camille-gubian",
+      "image": {
+        "url": "images/cam-portfolio-project.jpeg",
+        "class": "img0",
+        "width": 1280,
+        "height": 1024
+      },
+      "website": {
+        "image": {
+          "url": "images/camille-gubian-portfolio-website.png"
+        },
+        "url": "https://camillegubian.fr/"
+      },
+      "role": [
+        {
+          "id": 0,
+          "label": "developmnent"
+        }
+      ],
+      "parts": {
+        "date": {
+          "title": "date",
+          "content": "Juin 2022"
+        },
+        "client": {
+          "title": "client",
+          "content": "Camille GUBIAN"
+        },
+        "technologies": {
+          "label": "technologies",
+          "content": "VUEJS / CMS - PRISMIC"
+        },
+        "description": {
+          "title": "description",
+          "content": "This is a portfolio website for Camille Gubian. It is a responsive website that is fully functional and fully responsive. It is built with HTML5, CSS3, and JavaScript. The website is fully responsive and works on all devices."
+        }
+      },
+      "value": {
+        "class": "project-title-0",
+        "revealTitle": false,
+        "revealPagination": false
+      }
+    },
+    {
+      "id": 1,
+      "class": "project1",
+      "title": "soul funk factory",
+      "type": "music band",
+      "route": "soul-funk-factory",
+      "image": {
+        "url": "images/sff-project.jpeg",
+        "class": "img1",
+        "width": 2857,
+        "height": 4000
+      },
+      "website": {
+        "image": {
+          "url": "images/out-of-school-website.png"
+        },
+        "url": "https://out-of-school.vercel.app/"
+      },
+      "role": [
+        {
+          "id": 0,
+          "label": "developmnent"
+        },
+        {
+          "id": 1,
+          "label": "design"
+        }
+      ],
+      "parts": {
+        "date": {
+          "title": "date",
+          "content": "Juillet 2022"
+        },
+        "client": {
+          "title": "client",
+          "content": "Soul Funk Factory - Music band"
+        },
+        "technologies": {
+          "label": "technologies",
+          "content": "VUEJS / CMS - PRISMIC"
+        },
+        "description": {
+          "title": "description",
+          "content": "This is a portfolio website for Soul Funk Factory. It is a responsive website that is fully functional and fully responsive. It is built with HTML5, CSS3, and JavaScript. The website is fully responsive and works on all devices."
+        }
+      },
+      "value": {
+        "class": "project-title-1",
+        "revealTitle": false,
+        "revealPagination": false
+      }
+    },
+    {
+      "id": 2,
+      "class": "project2",
+      "title": "out of school",
+      "type": "culture",
+      "route": "out-of-school",
+      "image": {
+        "url": "images/out-of-school-project.jpeg",
+        "class": "img2",
+        "width": 6288,
+        "height": 3536
+      },
+      "website": {
+        "image": {
+          "url": "images/out-of-school-website.png"
+        },
+        "url": "https://out-of-school.vercel.app/"
+      },
+      "role": [
+        {
+          "id": 0,
+          "label": "developmnent"
+        },
+        {
+          "id": 1,
+          "label": "design"
+        }
+      ],
+      "parts": {
+        "date": {
+          "title": "date",
+          "content": "April - Mai 2022"
+        },
+        "client": {
+          "title": "client",
+          "content": "School project"
+        },
+        "technologies": {
+          "label": "technologies",
+          "content": "REACTJS / CMS - PRISMIC"
+        },
+        "description": {
+          "title": "description",
+          "content": "This is a school project."
+        }
+      },
+      "value": {
+        "class": "project-title-2",
+        "revealTitle": false,
+        "revealPagination": false
+      }
+    }
+  ]
 }

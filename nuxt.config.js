@@ -22,6 +22,7 @@ export default {
     '~/assets/scss/reset.scss',
     '~/assets/scss/variables.scss',
     '~/assets/scss/main.scss',
+    '~/assets/scss/scroll.scss',
   ],
 
   // loading: '~/components/Loader/Loader.vue',
@@ -29,7 +30,6 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [],
-
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -43,7 +43,7 @@ export default {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: ['@nuxtjs/axios',],
+  modules: ['@nuxtjs/axios'],
   axios: {
     proxy: true,
     mode: 'no-cors',

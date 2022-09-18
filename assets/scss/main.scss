@@ -13,8 +13,7 @@ html {
     min-height: 100vh;
     height: fit-content;
     background-color: $black-color;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    overflow: hidden;
     color: $white-color;
 
     a {
@@ -50,5 +49,12 @@ html {
     top: 0;
     left: 0;
     z-index: -1;
+  }
+
+  span.c-scrollbar_thumb {
+    background-color: $white-color;
+    opacity: 1;
+    width: 3px;
+    border-radius: 0px;
   }
 }

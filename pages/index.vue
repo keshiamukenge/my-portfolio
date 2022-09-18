@@ -100,9 +100,32 @@ export default {
   },
   transition: {
     leave(el, done) {
-      setTimeout(() => {
-        done()
-      }, 2200)
+      const canvas = document.querySelector('canvas')
+      if (this.$nuxt._route.name === 'About') {
+        gsap.to(el, {
+          duration: 0.5,
+          opacity: 0,
+          ease: Power2.easeInOut,
+        })
+        gsap.to(canvas, {
+          duration: 0.5,
+          opacity: 0,
+          ease: Power2.easeInOut,
+          onComplete: () => canvas.remove(),
+        })
+        setTimeout(() => {
+          done()
+        }, 700)
+      } else {
+        gsap.to(el, {
+          duration: 0.5,
+          opacity: 0,
+          ease: Power2.easeInOut,
+        })
+        setTimeout(() => {
+          done()
+        }, 2200)
+      }
     },
   },
   data() {
@@ -126,6 +149,7 @@ export default {
       },
       updateSize: false,
       touchTextureOptions: {},
+      openUserInteraction: false,
     }
   },
   async mounted() {
@@ -142,7 +166,10 @@ export default {
       console.log(e)
     }
 
-    this.SET_BODY_OVERFLOW()
+    setTimeout(() => {
+      this.openUserInteraction = true
+    }, 2200)
+
     this.touchTextureOptions = setTouchTextureValue({
       size: 50,
       radius: 50 * 0.9,
@@ -154,16 +181,20 @@ export default {
     this.update()
 
     window.addEventListener('wheel', (event) => {
-      if (!this.isRunning) {
-        this.SET_PREVIOUS_ACTIVE_PROJECT({
-          id: this.activeId,
-        })
-        if (event.deltaY > 0) {
-          this.setActivedProject('next')
-          this.startWebglTransition()
-        } else {
-          this.setActivedProject('previous')
-          this.startWebglTransition()
+      if (this.openUserInteraction) {
+        if (this.$nuxt._route.name === 'index') {
+          if (!this.isRunning) {
+            this.SET_PREVIOUS_ACTIVE_PROJECT({
+              id: this.activeId,
+            })
+            if (event.deltaY > 0) {
+              this.setActivedProject('next')
+              this.startWebglTransition()
+            } else {
+              this.setActivedProject('previous')
+              this.startWebglTransition()
+            }
+          }
         }
       }
     })
@@ -175,7 +206,6 @@ export default {
       'SET_ACTIVED_PROJECT',
       'SET_PREVIOUS_ACTIVE_PROJECT',
       'SET_DISAPPEAR_TITLE',
-      'SET_BODY_OVERFLOW',
     ]),
     setActivedProject(direction) {
       if (direction === 'next') {
@@ -257,7 +287,7 @@ export default {
 
       this.composer = new EffectComposer(this.renderer)
 
-      this.pageContainer.appendChild(this.renderer.domElement)
+      document.body.appendChild(this.renderer.domElement)
 
       // setup plane
       this.geometry = new THREE.PlaneBufferGeometry(1, 1, 62, 62)
@@ -466,7 +496,9 @@ export default {
         maxAge: this.touchTextureOptions.maxAge,
         radius: this.touchTextureOptions.radius,
       })
-      this.onResize()
+      if (this.$nuxt._route.name === 'index') {
+        this.onResize()
+      }
       this.material.uniformsNeedUpdate = true
       this.composer.render(this.clock.getDelta())
     },

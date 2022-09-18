@@ -1,14 +1,14 @@
 const baseURL = 'http://localhost:3000/data/data.json'
 
 export const state = {
-	headerData: {},
-	footerData: {},
+  headerData: {},
+  footerData: {},
   projectsData: [],
   defaultId: 0,
   selectedProject: {},
   activeProject: {},
   previousActiveProject: null,
-	error: ''
+  error: '',
 }
 
 export const mutations = {
@@ -35,7 +35,7 @@ export const mutations = {
     state.previousActiveProject.value.revealPagination = false
   },
   SET_DISAPPEAR_TITLE(state) {
-    if(state?.selectedProject) {
+    if (state?.selectedProject) {
       state.selectedProject.value.revealTitle = false
     } else {
       state.projectsData[0].value.revealTitle = false
@@ -46,8 +46,8 @@ export const mutations = {
   },
   SET_BODY_OVERFLOW() {
     const path = window.location.pathname
-    
-    if(path.includes('project')) {
+
+    if (path.includes('project')) {
       document.body.style.overflowY = 'scroll'
     } else {
       document.body.style.overflowY = 'hidden'
@@ -56,9 +56,9 @@ export const mutations = {
   SET_SELECTED_PROJECT_WITH_ROUTER() {
     const currentPath = window.location.pathname.split('/')[2]
     const projects = state.projectsData
-    
-    projects.forEach(project => {
-      if(project.route === currentPath) {
+
+    projects.forEach((project) => {
+      if (project.route === currentPath) {
         state.selectedProject = project
       }
     })
@@ -69,38 +69,37 @@ export const mutations = {
 }
 
 export const actions = {
-	async fetchHeaderData({ commit }) {
-		try {
-			const data = await this.$axios.$get(baseURL)
+  async fetchHeaderData({ commit }) {
+    try {
+      const data = await this.$axios.$get(baseURL)
 
-			commit('SET_HEADER_DATA', data.essentials.header)
-		} catch (e) {
+      commit('SET_HEADER_DATA', data.essentials.header)
+    } catch (e) {
       const error = 'Error while fetching header data'
 
       commit('SET_ERROR', error)
     }
   },
-	async fetchFooterData({ commit }) {
-		try {
-			const data = await this.$axios.$get(baseURL)
+  async fetchFooterData({ commit }) {
+    try {
+      const data = await this.$axios.$get(baseURL)
 
-			commit('SET_FOOTER_DATA', data.essentials.footer)
-		} catch (e) {
+      commit('SET_FOOTER_DATA', data.essentials.footer)
+    } catch (e) {
       const error = 'Error while fetching footer data'
 
       commit('SET_ERROR', error)
     }
   },
-	async fetchProjectsData({ commit }) {
-		try {
-			const data = await this.$axios.$get(baseURL)
+  async fetchProjectsData({ commit }) {
+    try {
+      const data = await this.$axios.$get(baseURL)
 
-			commit('SET_PROJECTS_DATA', data.projects)
-		} catch (e) {
+      commit('SET_PROJECTS_DATA', data.projects)
+    } catch (e) {
       const error = 'Error while fetching projects data'
 
       commit('SET_ERROR', error)
     }
   },
 }
-  
