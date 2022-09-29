@@ -1,6 +1,5 @@
 <template>
   <div ref="pageContainer">
-    <Header />
     <Loader />
     <ContainerProjects>
       <ContainerProject
@@ -14,7 +13,7 @@
             @click="
               SET_SELECTED_PROJECT({ id: activeId })
               SET_DISAPPEAR_TITLE()
-              scaleUpPlaneCoverWindowSize()
+              webgl.scaleUpPlaneCoverWindowSize()
             "
           />
           <ProjectTitle>
@@ -52,27 +51,16 @@
         </NuxtLink>
       </ContainerProject>
     </ContainerProjects>
-    <Footer />
   </div>
 </template>
 
 <script>
 import gsap, { Power2 } from 'gsap'
 import { mapMutations } from 'vuex'
-import * as THREE from 'three'
-import { EffectPass, EffectComposer, RenderPass } from 'postprocessing'
 import Title from '../shared/vue-lib/src/stories/components/Title/Title.vue'
 
 import { fonts, colors } from '../theme'
-import { Header, Footer } from '../components/Essentials'
 import Loader from '../components/Loader'
-import {
-  initTexture,
-  addPoint,
-  updatePoints,
-  setTouchTextureValue,
-} from './utils/touchTexture'
-import waterEffect from './utils/waterEffect'
 import {
   ContainerProjects,
   ContainerProject,
@@ -82,12 +70,12 @@ import {
   Pagination,
   PaginationDivided,
 } from './styledComponents'
+import smoothScroll from '@/mixins/smoothScroll'
+import useWebGL from '@/hooks/useWebGL'
 
 export default {
   name: 'Home',
   components: {
-    Header,
-    Footer,
     ContainerProjects,
     ContainerProject,
     ImageElement,
@@ -98,6 +86,7 @@ export default {
     PaginationDivided,
     Loader,
   },
+  mixins: [smoothScroll],
   transition: {
     leave(el, done) {
       const canvas = document.querySelector('canvas')
@@ -130,6 +119,7 @@ export default {
   },
   data() {
     return {
+      webgl: null,
       titleFont: fonts.titleFont,
       bodyFont: fonts.bodyFont,
       titleColor: colors.white,
@@ -142,14 +132,6 @@ export default {
         height: 0,
         aspect: 0,
       },
-      size: {
-        width: 0,
-        height: 0,
-        aspect: 0,
-      },
-      updateSize: false,
-      touchTextureOptions: {},
-      openUserInteraction: false,
     }
   },
   async mounted() {
@@ -166,37 +148,50 @@ export default {
       console.log(e)
     }
 
-    setTimeout(() => {
-      this.openUserInteraction = true
-    }, 2200)
-
-    this.touchTextureOptions = setTouchTextureValue({
-      size: 50,
-      radius: 50 * 0.9,
-      maxAge: 30,
+    this.webgl = useWebGL({
+      viewportSize: this.$store.state.viewport,
+      imageOptions: this.imagesOptions,
+      waterEffectOptions: {
+        size: 50,
+        radius: 50 * 0.9,
+        maxAge: 30,
+      },
+      textures: {
+        active: this.$store.state.projectsData[this.activeId]?.image,
+        previous:
+          this.$store.state.projectsData[
+            this.$store.state.previousActiveProject?.id
+          ]?.image?.url,
+        default:
+          this.$store.state.projectsData[this.$store.state.defaultId]?.image
+            ?.url,
+        selected:
+          this.$store.state.projectsData[this.$store.state.selectedProject?.id]
+            ?.image?.url,
+      },
     })
+
     this.pageContainer = this.$refs.pageContainer
-    this.setMousePosition()
-    this.initWebgl()
-    this.update()
 
     window.addEventListener('wheel', (event) => {
-      if (this.openUserInteraction) {
-        if (this.$nuxt._route.name === 'index') {
-          if (!this.isRunning) {
-            this.SET_PREVIOUS_ACTIVE_PROJECT({
-              id: this.activeId,
-            })
-            if (event.deltaY > 0) {
-              this.setActivedProject('next')
-              this.startWebglTransition()
-            } else {
-              this.setActivedProject('previous')
-              this.startWebglTransition()
-            }
+      if (this.$nuxt._route.name === 'index') {
+        if (!this.isRunning) {
+          this.SET_PREVIOUS_ACTIVE_PROJECT({
+            id: this.activeId,
+          })
+          if (event.deltaY > 0) {
+            this.setActivedProject('next')
+            this.webgl.startWebglTransition()
+          } else {
+            this.setActivedProject('previous')
+            this.startWebglTransition()
           }
         }
       }
+    })
+
+    window.addEventListener('resize', () => {
+      this.webgl.setPlaneCenteredPosition()
     })
   },
   methods: {
@@ -221,237 +216,6 @@ export default {
       this.SET_ACTIVED_PROJECT({ id: this.activeId })
     },
 
-    // ANIMATION & TRANSITIONS
-    startWebglTransition() {
-      if (this.isRunning) return
-
-      this.isRunning = true
-      this.material.uniforms.texture2.value = new THREE.TextureLoader().load(
-        this.$store.state.projectsData[this.activeId].image.url
-      )
-      gsap.to(this.material.uniforms.progress, {
-        value: 1,
-        duration: 2,
-        ease: Power2.easeInOut,
-        onComplete: () => {
-          this.material.uniforms.texture1.value =
-            new THREE.TextureLoader().load(
-              this.$store.state.projectsData[this.activeId].image.url
-            )
-          this.material.uniforms.progress.value = 0
-          this.isRunning = false
-        },
-      })
-    },
-    scaleUpPlaneCoverWindowSize() {
-      if (this.imagesOptions.aspect > this.size.aspect) {
-        gsap.to(this.plane.scale, {
-          x: this.imagesOptions.aspect / this.size.aspect,
-          y: 1,
-          duration: 1.7,
-          ease: Power2.easeInOut,
-        })
-      } else {
-        gsap.to(this.plane.scale, {
-          x: 1,
-          y: this.size.aspect / this.imagesOptions.aspect,
-          duration: 1.7,
-          ease: Power2.easeInOut,
-        })
-      }
-    },
-
-    // SETUP 3D SCENE
-    initWebgl() {
-      this.waterTexture = initTexture()
-      this.clock = new THREE.Clock()
-
-      this.setViewportSize()
-
-      this.camera = new THREE.OrthographicCamera(
-        -0.5,
-        0.5,
-        0.5,
-        -0.5,
-        -1000,
-        1000
-      )
-      // this.camera.position.z = 600
-      this.scene = new THREE.Scene()
-
-      this.renderer = new THREE.WebGLRenderer({
-        alpha: true,
-        antialias: false,
-      })
-      this.renderer.setSize(this.size.width, this.size.height)
-
-      this.composer = new EffectComposer(this.renderer)
-
-      document.body.appendChild(this.renderer.domElement)
-
-      // setup plane
-      this.geometry = new THREE.PlaneBufferGeometry(1, 1, 62, 62)
-
-      this.previousTexture =
-        this.$store.state.projectsData[
-          this.$store.state.previousActiveProject?.id
-        ]?.image?.url
-      this.selectedTexture =
-        this.$store.state.projectsData[
-          this.$store.state.selectedProject?.id
-        ]?.image?.url
-      this.defaultTexture =
-        this.$store.state.projectsData[this.$store.state.defaultId]?.image?.url
-
-      this.texture1 = () => {
-        if (this.selectedTexture) {
-          return new THREE.TextureLoader().load(this.selectedTexture)
-        } else if (this.previous) {
-          return new THREE.TextureLoader().load(this.previous)
-        } else {
-          return new THREE.TextureLoader().load(this.defaultTexture)
-        }
-      }
-
-      this.material = new THREE.ShaderMaterial({
-        side: THREE.DoubleSide,
-        depthTest: false,
-        transparent: true,
-        vertexShader: `
-          varying vec2 vUv;
-
-          void main() {
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-
-            vUv = uv;
-          }
-        `,
-        fragmentShader: `
-          uniform float progress;
-		      uniform float intensity;
-		      uniform float width;
-		      uniform float scaleX;
-		      uniform float scaleY;
-		      uniform float transition;
-		      uniform float radius;
-		      uniform float swipe;
-		      uniform sampler2D texture1;
-		      uniform sampler2D texture2;
-		      uniform sampler2D displacement;
-		      uniform vec4 resolution;
-          uniform bool distorsion;
-
-          varying vec2 vUv;
-
-          mat2 getRotM(float angle) {
-		        float s = sin(angle);
-		        float c = cos(angle);
-		        return mat2(c, -s, s, c);
-		      }
-
-          const float PI = 3.1415;
-		      const float angle1 = PI * 0.25;
-		      const float angle2 = -PI * 0.75;
-
-          void main()	{
-			      vec2 newUV = (vUv - vec2(0.5))*resolution.zw + vec2(0.5);
-			      vec4 disp = texture2D(displacement, newUV);
-			      vec2 dispVec = vec2(disp.r, disp.g);
-            vec2 distortedPosition1 =  newUV + getRotM(angle1) * dispVec * intensity * progress;
-			      vec4 t1 = texture2D(texture1, distortedPosition1);
-			      vec2 distortedPosition2 = newUV + getRotM(angle2) * dispVec * intensity * (1.0 - progress);
-			      vec4 t2 = texture2D(texture2, distortedPosition2);
-			      gl_FragColor = mix(t1, t2, progress);
-		      }
-        `,
-        uniforms: {
-          uFrequency: {
-            value: new THREE.Vector2(20, 5),
-          },
-          progress: {
-            type: 'f',
-            value: 0,
-          },
-          border: {
-            type: 'f',
-            value: 0,
-          },
-          intensity: {
-            type: 'f',
-            value: 1,
-          },
-          scaleX: {
-            type: 'f',
-            value: 40,
-          },
-          scaleY: {
-            type: 'f',
-            value: 40,
-          },
-          transition: {
-            type: 'f',
-            value: 40,
-          },
-          swipe: {
-            type: 'f',
-            value: 0,
-          },
-          width: {
-            type: 'f',
-            value: 0,
-          },
-          radius: {
-            type: 'f',
-            value: 0,
-          },
-          texture1: {
-            type: 'f',
-            value: this.texture1(),
-          },
-          texture2: {
-            type: 'f',
-            value: new THREE.TextureLoader().load(
-              this.$store.state.projectsData[this.activeId].image.url
-            ),
-          },
-          displacement: {
-            type: 'f',
-            value: new THREE.TextureLoader().load('textures/disp1.jpeg'),
-          },
-          resolution: {
-            type: 'v4',
-            value: new THREE.Vector4(0.9, 0.9, 0.9, 0.9),
-          },
-          distorsion: {
-            type: 'bool',
-            value: false,
-          },
-        },
-      })
-      this.material.uniformsNeedUpdate = true
-      this.material.uniforms.texture1.matrixAutoUpdate = false
-
-      this.plane = new THREE.Mesh(this.geometry, this.material)
-      this.plane.scale.z = 1
-      this.setPlaneSize()
-
-      this.scene.add(this.plane)
-
-      this.initComposer()
-    },
-
-    // EVENTS
-    onResize() {
-      window.addEventListener('resize', () => {
-        this.setViewportSize()
-        this.setPlaneSize()
-
-        this.camera.updateProjectionMatrix()
-
-        this.composer.setSize(this.size.width, this.size.height)
-      })
-    },
-
     // SETTERS
     setImageOptions({ image }) {
       this.imagesOptions = {
@@ -459,59 +223,6 @@ export default {
         height: image.height,
         aspect: image.width / image.height,
       }
-    },
-    setViewportSize() {
-      this.size = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        aspect: window.innerWidth / window.innerHeight,
-      }
-    },
-    setPlaneSize() {
-      if (this.imagesOptions.aspect > this.size.aspect) {
-        this.plane.scale.x = this.imagesOptions.aspect / this.size.aspect / 2.8
-        this.plane.scale.y = 1 / 2.3
-      } else {
-        this.plane.scale.x = 1 / 2.8
-        this.plane.scale.y = this.size.aspect / this.imagesOptions.aspect / 2.3
-      }
-    },
-    setMousePosition() {
-      window.addEventListener('mousemove', (event) => {
-        this.mousePosition = {
-          x: event.clientX / window.innerWidth,
-          y: event.clientY / window.innerHeight,
-        }
-
-        addPoint({
-          point: this.mousePosition,
-          radius: this.touchTextureOptions.radius,
-          maxAge: this.touchTextureOptions.maxAge,
-        })
-      })
-    },
-    update() {
-      requestAnimationFrame(this.update)
-      updatePoints({
-        maxAge: this.touchTextureOptions.maxAge,
-        radius: this.touchTextureOptions.radius,
-      })
-      if (this.$nuxt._route.name === 'index') {
-        this.onResize()
-      }
-      this.material.uniformsNeedUpdate = true
-      this.composer.render(this.clock.getDelta())
-    },
-
-    // SETUP POST PROCESSING
-    initComposer() {
-      const renderPass = new RenderPass(this.scene, this.camera)
-      this.waterEffect = waterEffect({ texture: this.waterTexture })
-      const waterPass = new EffectPass(this.camera, this.waterEffect)
-      waterPass.renderToScreen = true
-      renderPass.renderToScreen = false
-      this.composer.addPass(renderPass)
-      this.composer.addPass(waterPass)
     },
   },
 }

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Header :before-go-home="hideText" />
     <AboutContainer>
       <AboutContainerContent>
         <AboutTitle>
@@ -98,7 +97,6 @@
         </AboutContent>
       </AboutContainerContent>
     </AboutContainer>
-    <Footer />
   </div>
 </template>
 
@@ -107,7 +105,6 @@ import { mapMutations } from 'vuex'
 import Title from '../shared/vue-lib/src/stories/components/Title/Title.vue'
 import Paragraph from '../shared/vue-lib/src/stories/components/Paragraph/Paragraph.vue'
 
-import { Header, Footer } from '../components/Essentials'
 import { fonts, colors } from '../theme'
 import {
   AboutContainer,
@@ -119,14 +116,13 @@ import {
   AboutSpan,
   AboutSubtitle,
 } from './styledComponents'
+import smoothScroll from '@/mixins/smoothScroll'
 
 export default {
   name: 'About',
   components: {
     AboutContainer,
     AboutContainerContent,
-    Header,
-    Footer,
     AboutContent,
     AboutTitle,
     ContainerAboutSection,
@@ -136,6 +132,7 @@ export default {
     Title,
     Paragraph,
   },
+  mixins: [smoothScroll],
   transition: {
     leave(el, done) {
       // gsap.to(el, {

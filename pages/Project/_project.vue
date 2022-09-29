@@ -1,12 +1,6 @@
 <template>
-  <PageContainer ref="pageContainer">
-    <Header :before-go-about="hideText" :before-go-home="hideText" />
-    <MainContainer
-      ref="projectContainer"
-      data-scroll-container
-      data-scroll-offset
-      data-scroll
-    >
+  <PageContainer ref="pageContainer" data-scroll>
+    <MainContainer ref="projectContainer">
       <ContainerProjectInformationsSection>
         <ContainerProjectInformationsIntroduction>
           <ProjectTitle>
@@ -217,7 +211,6 @@
             </ImageWebsiteLink>
           </ContainerImageWebsite>
         </ContainerProjectInformationsContent>
-        <Footer bottom="74vh" />
       </ContainerProjectInformationsSection>
     </MainContainer>
   </PageContainer>
@@ -229,13 +222,10 @@ import * as THREE from 'three'
 import { EffectPass, EffectComposer, RenderPass } from 'postprocessing'
 import Intersect from 'vue-intersect'
 import { mapMutations } from 'vuex'
-import LocomotiveScroll from 'locomotive-scroll'
 import Title from '../../shared/vue-lib/src/stories/components/Title/Title.vue'
 import Paragraph from '../../shared/vue-lib/src/stories/components/Paragraph/Paragraph.vue'
 
-// import SmoothScroll from '../../components/SmoothScroll'
 import { colors, fonts } from '../../theme'
-import { Header, Footer } from '../../components/Essentials'
 import {
   initTexture,
   addPoint,
@@ -261,12 +251,11 @@ import {
   ImageElement,
   ImageWebsiteLink,
 } from './styledComponents'
+import smoothScroll from '@/mixins/smoothScroll'
 
 export default {
   name: 'Project',
   components: {
-    Header,
-    Footer,
     MainContainer,
     ProjectTitle,
     ContainerProjectInformationsSection,
@@ -287,10 +276,10 @@ export default {
     ContainerProjectInformationsIntroduction,
     ContainerProjectInformationsContent,
   },
+  mixins: [smoothScroll],
   transition: {
     leave(el, done) {
       const canvas = document.querySelector('canvas')
-      const scrollBar = document.querySelector('.c-scrollbar')
 
       gsap.to(el, {
         duration: 0.5,
@@ -305,7 +294,6 @@ export default {
         ease: Power2.easeInOut,
         onComplete: () => {
           document.body.removeChild(canvas)
-          document.body.removeChild(scrollBar)
           done()
         },
       })
@@ -354,11 +342,11 @@ export default {
       console.log(e)
     }
 
-    this.scroll = new LocomotiveScroll({
-      el: document.querySelector('[data-scroll-container]'),
-      smooth: true,
-      offset: [20, 0],
-    })
+    // this.scroll = new LocomotiveScroll({
+    //   el: document.querySelector('[data-scroll-container]'),
+    //   smooth: true,
+    //   offset: [20, 0],
+    // })
 
     this.touchTextureOptions = setTouchTextureValue({
       size: 80,
@@ -374,9 +362,9 @@ export default {
     }
     this.websiteImage.el = this.$refs.websiteImage.$el
 
-    setTimeout(() => {
-      this.upContainerProjectInformations()
-    }, 1000)
+    // setTimeout(() => {
+    //   this.upContainerProjectInformations()
+    // }, 1000)
   },
   methods: {
     ...mapMutations(['SET_DISAPPEAR_TITLE', 'SET_BODY_OVERFLOW']),

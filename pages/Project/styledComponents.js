@@ -2,21 +2,19 @@ import styled from 'vue-styled-components'
 
 import { colors, fonts } from '../../theme'
 
-const windowHeight = window.innerHeight + window.innerHeight * 0.73
+// const windowHeight = window.innerHeight + window.innerHeight * 0.73
 
-export const PageContainer = styled.main`
+export const PageContainer = styled.div`
   width: 100%;
-  height: auto;
+  height: fit-content;
   min-width: 100vw;
   min-height: 100vh;
-  margin: auto;
-  position: fixed;
+  padding-top: 80vh;
 `
 
-export const MainContainer = styled.main`
+export const MainContainer = styled.div`
 	width: 100vw;
-	height: ${windowHeight}px};
-	margin-top: 100vh;
+	height: 100vh;
 	display: flex;
 	flex-direction: column;
 	background-color: ${colors.black};

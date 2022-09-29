@@ -9,9 +9,19 @@ export const state = {
   activeProject: {},
   previousActiveProject: null,
   error: '',
+  viewport: {
+    width: 0,
+    height: 0,
+    aspect: 0
+  },
 }
 
 export const mutations = {
+  SET_VIEWPORT(state) {
+    state.viewport.width = window.innerWidth
+    state.viewport.height = window.innerHeight
+    state.viewport.aspect = window.innerWidth / window.innerHeight
+  },
   SET_HEADER_DATA(state, headerData) {
     state.headerData = headerData
   },
