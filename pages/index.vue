@@ -1,20 +1,16 @@
 <template>
-  <div ref="pageContainer">
+  <div>
     <Loader />
     <ContainerProjects>
       <ContainerProject
         v-for="project in $store.state.projectsData"
         :key="project.id"
       >
-        <NuxtLink :to="'/project/' + $store.state.projectsData[activeId].route">
+        <NuxtLink :to="'/project/' + selectedProject.route">
           <ImageElement
             ref="images"
             :src="project.image.url"
-            @click="
-              SET_SELECTED_PROJECT({ id: activeId })
-              SET_DISAPPEAR_TITLE()
-              webgl.scaleUpPlaneCoverWindowSize()
-            "
+            @click="SET_SELECTED_PROJECT({ id: activeProject.id || 0 })"
           />
           <ProjectTitle>
             <Title
@@ -56,7 +52,7 @@
 
 <script>
 import gsap, { Power2 } from 'gsap'
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import Title from '../shared/vue-lib/src/stories/components/Title/Title.vue'
 
 import { fonts, colors } from '../theme'
@@ -89,18 +85,11 @@ export default {
   mixins: [smoothScroll],
   transition: {
     leave(el, done) {
-      const canvas = document.querySelector('canvas')
       if (this.$nuxt._route.name === 'About') {
         gsap.to(el, {
           duration: 0.5,
           opacity: 0,
           ease: Power2.easeInOut,
-        })
-        gsap.to(canvas, {
-          duration: 0.5,
-          opacity: 0,
-          ease: Power2.easeInOut,
-          onComplete: () => canvas.remove(),
         })
         setTimeout(() => {
           done()
@@ -123,70 +112,77 @@ export default {
       titleFont: fonts.titleFont,
       bodyFont: fonts.bodyFont,
       titleColor: colors.white,
-      pageContainer: null,
-      activeId: this.$store.state.activeProject?.id
-        ? this.$store.state.activeProject.id
-        : 0,
       imagesOptions: {
         width: 0,
         height: 0,
         aspect: 0,
       },
+      textures: {
+        default: null,
+        active: null,
+        previous: null,
+        next: null,
+      },
     }
+  },
+  computed: {
+    ...mapGetters({
+      projects: 'GET_PROJECTS_DATA',
+      activeProject: 'GET_ACTIVE_PROJECT',
+      previousProject: 'GET_PREVIOUS_PROJECT',
+      nextProject: 'GET_NEXT_PROJECT',
+      selectedProject: 'GET_SELECTED_PROJECT',
+      viewport: 'GET_VIEWPORT',
+    }),
+  },
+  watch: {
+    // eslint-disable-next-line object-shorthand
+    activeProject: function () {
+      this.textures = {
+        default: this.projects[0].image.url,
+        active: this.activeProject.image.url,
+        previous: this.previousProject.image.url,
+        next: this.nextProject.image.url,
+      }
+      this.webgl.startWebglTransition({ textures: this.textures })
+    },
+    // eslint-disable-next-line object-shorthand
+    selectedProject: function () {
+      this.SET_DISAPPEAR_TITLE()
+      this.webgl.scaleUpPlaneCoverWindowSize()
+    },
   },
   async mounted() {
     try {
       await this.$store.dispatch('fetchProjectsData')
-      await this.setImageOptions({
-        image:
-          this.$store.state.projectsData[this.$store.state.defaultId].image,
-      })
-      await this.SET_ACTIVED_PROJECT({
-        id: this.activeId,
-      })
+
+      await this.setImageOptions({ image: this.projects[0].image })
+      await this.SET_ACTIVED_PROJECT({ id: 0 })
+
+      this.textures.default = this.textures.active = this.projects[0].image.url
+      this.textures.next = this.projects[1].image.url
     } catch (e) {
       console.log(e)
     }
 
     this.webgl = useWebGL({
-      viewportSize: this.$store.state.viewport,
+      viewportSize: this.viewport,
       imageOptions: this.imagesOptions,
       waterEffectOptions: {
         size: 50,
         radius: 50 * 0.9,
         maxAge: 30,
       },
-      textures: {
-        active: this.$store.state.projectsData[this.activeId]?.image,
-        previous:
-          this.$store.state.projectsData[
-            this.$store.state.previousActiveProject?.id
-          ]?.image?.url,
-        default:
-          this.$store.state.projectsData[this.$store.state.defaultId]?.image
-            ?.url,
-        selected:
-          this.$store.state.projectsData[this.$store.state.selectedProject?.id]
-            ?.image?.url,
-      },
+      textures: this.textures,
     })
 
-    this.pageContainer = this.$refs.pageContainer
-
     window.addEventListener('wheel', (event) => {
-      if (this.$nuxt._route.name === 'index') {
-        if (!this.isRunning) {
-          this.SET_PREVIOUS_ACTIVE_PROJECT({
-            id: this.activeId,
-          })
-          if (event.deltaY > 0) {
-            this.setActivedProject('next')
-            this.webgl.startWebglTransition()
-          } else {
-            this.setActivedProject('previous')
-            this.startWebglTransition()
-          }
-        }
+      if (this.webgl.isRunning) return
+
+      if (event.deltaY > 0) {
+        this.SET_PROJECTS_ORDER({ direction: 1 })
+      } else {
+        this.SET_PROJECTS_ORDER({ direction: 0 })
       }
     })
 
@@ -195,28 +191,14 @@ export default {
     })
   },
   methods: {
-    // STORE
     ...mapMutations([
       'SET_SELECTED_PROJECT',
       'SET_ACTIVED_PROJECT',
       'SET_PREVIOUS_ACTIVE_PROJECT',
       'SET_DISAPPEAR_TITLE',
+      'SET_PROJECTS_ORDER',
     ]),
-    setActivedProject(direction) {
-      if (direction === 'next') {
-        this.activeId++
 
-        if (this.activeId > this.$store.state.projectsData.length - 1) {
-          this.activeId = 0
-        }
-      } else {
-        this.activeId === 0 ? (this.activeId = 2) : this.activeId--
-      }
-
-      this.SET_ACTIVED_PROJECT({ id: this.activeId })
-    },
-
-    // SETTERS
     setImageOptions({ image }) {
       this.imagesOptions = {
         width: image.width,

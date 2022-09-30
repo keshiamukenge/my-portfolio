@@ -342,12 +342,6 @@ export default {
       console.log(e)
     }
 
-    // this.scroll = new LocomotiveScroll({
-    //   el: document.querySelector('[data-scroll-container]'),
-    //   smooth: true,
-    //   offset: [20, 0],
-    // })
-
     this.touchTextureOptions = setTouchTextureValue({
       size: 80,
       radius: 80 * 0.9,

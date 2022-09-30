@@ -4,7 +4,13 @@ export const state = {
   headerData: {},
   footerData: {},
   projectsData: [],
+  activeId: 0,
   defaultId: 0,
+  projectsOrder: {
+    active: 0,
+    previous: null,
+    next: null,
+  },
   selectedProject: {},
   activeProject: {},
   previousActiveProject: null,
@@ -14,6 +20,16 @@ export const state = {
     height: 0,
     aspect: 0
   },
+  webglTransitionIsRunning: false,
+}
+
+export const getters = {
+  GET_PROJECTS_DATA: (state) => state.projectsData,
+  GET_ACTIVE_PROJECT: (state) => state.projectsOrder.active,
+  GET_PREVIOUS_PROJECT: (state) => state.projectsOrder.previous,
+  GET_NEXT_PROJECT: (state) => state.projectsOrder.next,
+  GET_SELECTED_PROJECT: (state) => state.selectedProject,
+  GET_VIEWPORT: (state) => state.viewport
 }
 
 export const mutations = {
@@ -21,6 +37,35 @@ export const mutations = {
     state.viewport.width = window.innerWidth
     state.viewport.height = window.innerHeight
     state.viewport.aspect = window.innerWidth / window.innerHeight
+  },
+  SET_WEBGL_TRANSITION_IS_RUNNING(state, { value }) {
+    state.webglTransitionIsRunning = value
+  },
+  SET_PROJECTS_ORDER(state, { direction }) {
+    state.projectsOrder.previous = state.projectsData[state.activeId]
+
+      if (direction === 1) {
+        if(state.activeId === state.projectsData.length - 1) {
+          state.activeId = 0
+          state.projectsOrder.active = state.projectsData[state.activeId]
+          state.projectsOrder.next = state.projectsData[state.activeId + 1]
+
+        } else {
+          state.activeId += 1
+          const nextId = state.activeId === state.projectsData.length - 1 ? 0 : state.activeId + 1
+          state.projectsOrder.active = state.projectsData[state.activeId]
+          state.projectsOrder.next = state.projectsData[nextId]
+        }
+      } else if(state.activeId === 0) {
+          state.activeId = state.projectsData.length - 1
+          state.projectsOrder.active = state.projectsData[state.activeId]
+          state.projectsOrder.next = state.projectsData[state.activeId - 1]
+        } else {
+          state.activeId -= 1
+          const nextId = state.activeId === 0 ? state.projectsData.length - 1 : state.activeId - 1
+          state.projectsOrder.active = state.projectsData[state.activeId]
+          state.projectsOrder.next = state.projectsData[nextId]
+        }
   },
   SET_HEADER_DATA(state, headerData) {
     state.headerData = headerData

@@ -14,6 +14,7 @@ let webgl
 class WebGL {
 	constructor({ viewportSize, textures, imageOptions, waterEffectOptions }) {
 		this.sizes = viewportSize
+		this.isRunning = false
 
 		this.previousTexture = textures.previous
 		this.selectedTexture = textures.selected
@@ -29,7 +30,7 @@ class WebGL {
 	}
 
 	// SETUP 3D SCENE
-	initWebgl() {
+	initWebgl({ textures }) {
 		this.waterTexture = initTexture()
 		this.clock = new THREE.Clock()
 
@@ -159,13 +160,11 @@ class WebGL {
 				},
 				texture1: {
 					type: 'f',
-					value: this.texture1(),
+					value: new THREE.TextureLoader().load(textures.selected || textures.previous || textures.default),
 				},
 				texture2: {
 					type: 'f',
-					value: new THREE.TextureLoader().load(
-						this.activeTexture
-					),
+					value: new THREE.TextureLoader().load(textures.next),
 				},
 				displacement: {
 					type: 'f',
@@ -252,9 +251,9 @@ class WebGL {
 
 	// ANIMATIONS AND TRANSITIONS
 	scaleUpPlaneCoverWindowSize() {
-		if (this.imagesOptions.aspect > this.size.aspect) {
+		if (this.imagesOptions.aspect > this.sizes.aspect) {
 			gsap.to(this.plane.scale, {
-				x: this.imagesOptions.aspect / this.size.aspect,
+				x: this.imagesOptions.aspect / this.sizes.aspect,
 				y: 1,
 				duration: 1.7,
 				ease: Power2.easeInOut,
@@ -262,25 +261,25 @@ class WebGL {
 		} else {
 			gsap.to(this.plane.scale, {
 				x: 1,
-				y: this.size.aspect / this.imagesOptions.aspect,
+				y: this.sizes.aspect / this.imagesOptions.aspect,
 				duration: 1.7,
 				ease: Power2.easeInOut,
 			})
 		}
 	}
 
-	startWebglTransition() {
+	startWebglTransition({ textures }) {
 		if (this.isRunning) return
 
+
 		this.isRunning = true
-		this.material.uniforms.texture2.value = new THREE.TextureLoader().load(this.activeTexture)
+		this.material.uniforms.texture2.value = new THREE.TextureLoader().load(textures.active)
 		gsap.to(this.material.uniforms.progress, {
 			value: 1,
 			duration: 2,
 			ease: Power2.easeInOut,
 			onComplete: () => {
-				this.material.uniforms.texture1.value =
-					new THREE.TextureLoader().load(this.activeTexture)
+				this.material.uniforms.texture1.value = new THREE.TextureLoader().load(textures.active)
 				this.material.uniforms.progress.value = 0
 				this.isRunning = false
 			},
