@@ -10,7 +10,7 @@
           <ImageElement
             ref="images"
             :src="project.image.url"
-            @click="SET_SELECTED_PROJECT({ id: activeProject.id || 0 })"
+            @click="SET_SELECTED_PROJECT({ id: activeProject?.id || 0 })"
           />
           <ProjectTitle>
             <Title
@@ -42,7 +42,7 @@
               />
             </Pagination>
             <PaginationDivided />
-            <Pagination>3</Pagination>
+            <Pagination>{{ projects.length }}</Pagination>
           </ContainerPagination>
         </NuxtLink>
       </ContainerProject>
@@ -148,7 +148,6 @@ export default {
     },
     // eslint-disable-next-line object-shorthand
     selectedProject: function () {
-      this.SET_DISAPPEAR_TITLE()
       this.webgl.scaleUpPlaneCoverWindowSize()
     },
   },
@@ -157,7 +156,6 @@ export default {
       await this.$store.dispatch('fetchProjectsData')
 
       await this.setImageOptions({ image: this.projects[0].image })
-      await this.SET_ACTIVED_PROJECT({ id: 0 })
 
       this.textures.default = this.textures.active = this.projects[0].image.url
       this.textures.next = this.projects[1].image.url
@@ -191,13 +189,7 @@ export default {
     })
   },
   methods: {
-    ...mapMutations([
-      'SET_SELECTED_PROJECT',
-      'SET_ACTIVED_PROJECT',
-      'SET_PREVIOUS_ACTIVE_PROJECT',
-      'SET_DISAPPEAR_TITLE',
-      'SET_PROJECTS_ORDER',
-    ]),
+    ...mapMutations(['SET_SELECTED_PROJECT', 'SET_PROJECTS_ORDER']),
 
     setImageOptions({ image }) {
       this.imagesOptions = {

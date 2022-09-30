@@ -22,11 +22,12 @@ class WebGL {
 		this.activeTexture = textures.active
 
 		this.imagesOptions = imageOptions
+		this.waterEffectOptions = waterEffectOptions
 
-		this.setMousePosition({ waterEffectOptions })
+		this.setMousePosition({ waterEffectOptions: this.waterEffectOptions })
 		
 		this.initWebgl({ viewportSize, textures })
-		this.update({ waterEffectOptions })
+		this.update({ waterEffectOptions: this.waterEffectOptions })
 	}
 
 	// SETUP 3D SCENE

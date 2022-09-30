@@ -7,20 +7,17 @@ export const state = {
   activeId: 0,
   defaultId: 0,
   projectsOrder: {
-    active: 0,
+    active: null,
     previous: null,
     next: null,
   },
   selectedProject: {},
-  activeProject: {},
-  previousActiveProject: null,
   error: '',
   viewport: {
     width: 0,
     height: 0,
     aspect: 0
   },
-  webglTransitionIsRunning: false,
 }
 
 export const getters = {
@@ -38,34 +35,34 @@ export const mutations = {
     state.viewport.height = window.innerHeight
     state.viewport.aspect = window.innerWidth / window.innerHeight
   },
-  SET_WEBGL_TRANSITION_IS_RUNNING(state, { value }) {
-    state.webglTransitionIsRunning = value
-  },
   SET_PROJECTS_ORDER(state, { direction }) {
     state.projectsOrder.previous = state.projectsData[state.activeId]
 
-      if (direction === 1) {
-        if(state.activeId === state.projectsData.length - 1) {
-          state.activeId = 0
-          state.projectsOrder.active = state.projectsData[state.activeId]
-          state.projectsOrder.next = state.projectsData[state.activeId + 1]
+    if (direction === 1) {
+      if(state.activeId === state.projectsData.length - 1) {
+        state.activeId = 0
+        state.projectsOrder.active = state.projectsData[state.activeId]
+        state.projectsOrder.next = state.projectsData[state.activeId + 1]
 
-        } else {
-          state.activeId += 1
-          const nextId = state.activeId === state.projectsData.length - 1 ? 0 : state.activeId + 1
-          state.projectsOrder.active = state.projectsData[state.activeId]
-          state.projectsOrder.next = state.projectsData[nextId]
-        }
-      } else if(state.activeId === 0) {
-          state.activeId = state.projectsData.length - 1
-          state.projectsOrder.active = state.projectsData[state.activeId]
-          state.projectsOrder.next = state.projectsData[state.activeId - 1]
-        } else {
-          state.activeId -= 1
-          const nextId = state.activeId === 0 ? state.projectsData.length - 1 : state.activeId - 1
-          state.projectsOrder.active = state.projectsData[state.activeId]
-          state.projectsOrder.next = state.projectsData[nextId]
-        }
+      } else {
+        state.activeId += 1
+        const nextId = state.activeId === state.projectsData.length - 1 ? 0 : state.activeId + 1
+        state.projectsOrder.active = state.projectsData[state.activeId]
+        state.projectsOrder.next = state.projectsData[nextId]
+      }
+    } else if(state.activeId === 0) {
+        state.activeId = state.projectsData.length - 1
+        state.projectsOrder.active = state.projectsData[state.activeId]
+        state.projectsOrder.next = state.projectsData[state.activeId - 1]
+    } else {
+      state.activeId -= 1
+      const nextId = state.activeId === 0 ? state.projectsData.length - 1 : state.activeId - 1
+      state.projectsOrder.active = state.projectsData[state.activeId]
+      state.projectsOrder.next = state.projectsData[nextId]
+    }
+
+    state.projectsOrder.active.value.revealTitle = state.projectsOrder.active.value.revealPagination = true
+    state.projectsOrder.previous.value.revealTitle = state.projectsOrder.previous.value.revealPagination = false
   },
   SET_HEADER_DATA(state, headerData) {
     state.headerData = headerData
@@ -78,16 +75,7 @@ export const mutations = {
   },
   SET_SELECTED_PROJECT(state, { id }) {
     state.selectedProject = state.projectsData[id]
-  },
-  SET_ACTIVED_PROJECT(state, { id }) {
-    state.activeProject = state.projectsData[id]
-    state.activeProject.value.revealTitle = true
-    state.activeProject.value.revealPagination = true
-  },
-  SET_PREVIOUS_ACTIVE_PROJECT(state, { id }) {
-    state.previousActiveProject = state.projectsData[id]
-    state.previousActiveProject.value.revealTitle = false
-    state.previousActiveProject.value.revealPagination = false
+    console.log(state.selectedProject)
   },
   SET_DISAPPEAR_TITLE(state) {
     if (state?.selectedProject) {
