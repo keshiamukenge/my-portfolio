@@ -212,7 +212,7 @@
 
 <script>
 import gsap from 'gsap'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import Intersect from 'vue-intersect'
 import Title from '../../shared/vue-lib/src/stories/components/Title/Title.vue'
 import Paragraph from '../../shared/vue-lib/src/stories/components/Paragraph/Paragraph.vue'
@@ -263,6 +263,13 @@ export default {
     ContainerProjectInformationsContent,
   },
   mixins: [smoothScroll],
+  transition: {
+    leave(el, done) {
+      setTimeout(() => {
+        done()
+      }, 1000)
+    },
+  },
   data() {
     return {
       titleFont: fonts.titleFont,
@@ -331,6 +338,7 @@ export default {
     await this.disappearCanvas()
   },
   methods: {
+    ...mapMutations(['SET_DISABLE_ACTIVE_TITLE']),
     resizePlane() {
       const { setPlaneCenteredPosition } = useWebGL()
       setPlaneCenteredPosition()
@@ -370,8 +378,4 @@ export default {
     },
   },
 }
-
-// size: 80,
-//       radius: 80 * 0.9,
-//       maxAge: 80,
 </script>

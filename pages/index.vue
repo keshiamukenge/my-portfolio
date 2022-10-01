@@ -13,7 +13,7 @@
             @click="
               () => {
                 SET_SELECTED_PROJECT({ id: activeProject?.id || 0 })
-                SET_DISABLE_ACTIVE_PROJECT()
+                SET_DISABLE_ACTIVE_TITLE()
               }
             "
           />
@@ -90,6 +90,14 @@ export default {
   mixins: [smoothScroll],
   transition: {
     leave(el, done) {
+      if (this.$route.name === 'About') {
+        gsap.to(el, {
+          opacity: 0,
+          duration: 0.5,
+          onComplete: done,
+        })
+      }
+
       setTimeout(() => {
         done()
       }, 2200)
@@ -158,7 +166,7 @@ export default {
       duration: 0.5,
     })
 
-    this.SET_ENABLE_ACTIVE_PROJECT()
+    this.SET_ENABLE_ACTIVE_TITLE()
 
     this.webgl = useWebGL()
     this.webgl.textures = this.textures
@@ -171,8 +179,12 @@ export default {
 
       if (event.deltaY > 0) {
         this.SET_PROJECTS_ORDER({ direction: 1 })
+        this.SET_ENABLE_ACTIVE_TITLE()
+        this.SET_DISABLE_PREVIOUS_TITLE()
       } else {
         this.SET_PROJECTS_ORDER({ direction: 0 })
+        this.SET_ENABLE_ACTIVE_TITLE()
+        this.SET_DISABLE_PREVIOUS_TITLE()
       }
     })
 
@@ -182,12 +194,17 @@ export default {
       }
     })
   },
+  async beforeDestroy() {
+    await this.disappearCanvas()
+  },
   methods: {
     ...mapMutations([
       'SET_SELECTED_PROJECT',
       'SET_PROJECTS_ORDER',
-      'SET_DISABLE_ACTIVE_PROJECT',
-      'SET_ENABLE_ACTIVE_PROJECT',
+      'SET_DISABLE_PREVIOUS_TITLE',
+      'SET_DISABLE_ACTIVE_TITLE',
+      'SET_ENABLE_PREVIOUS_TITLE',
+      'SET_ENABLE_ACTIVE_TITLE',
     ]),
 
     setImageOptions({ image }) {
@@ -196,6 +213,15 @@ export default {
         height: image.height,
         aspect: image.width / image.height,
       }
+    },
+    disappearCanvas() {
+      if (this.$route.name !== 'About') return
+
+      const canvas = document.querySelector('canvas')
+      gsap.to(canvas, {
+        opacity: 0,
+        duration: 0.5,
+      })
     },
   },
 }
