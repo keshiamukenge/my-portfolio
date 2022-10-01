@@ -64,6 +64,20 @@ export const mutations = {
     state.projectsOrder.active.value.revealTitle = state.projectsOrder.active.value.revealPagination = true
     state.projectsOrder.previous.value.revealTitle = state.projectsOrder.previous.value.revealPagination = false
   },
+  SET_DISABLE_ACTIVE_PROJECT(state) {
+    if(state.projectsOrder.active?.value) {
+      state.projectsOrder.active.value.revealTitle = state.projectsOrder.active.value.revealPagination = false
+    } else {
+      state.projectsData[0].value.revealTitle = state.projectsData[0].value.revealPagination = false
+    }
+  },
+  SET_ENABLE_ACTIVE_PROJECT(state) {
+    if(state.projectsOrder.active?.value) {
+      state.projectsOrder.active.value.revealTitle = state.projectsOrder.active.value.revealPagination = true
+    } else {
+      state.projectsData[0].value.revealTitle = state.projectsData[0].value.revealPagination = true
+    }
+  },
   SET_HEADER_DATA(state, headerData) {
     state.headerData = headerData
   },
@@ -75,7 +89,6 @@ export const mutations = {
   },
   SET_SELECTED_PROJECT(state, { id }) {
     state.selectedProject = state.projectsData[id]
-    console.log(state.selectedProject)
   },
   SET_DISAPPEAR_TITLE(state) {
     if (state?.selectedProject) {

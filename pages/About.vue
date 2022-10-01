@@ -101,6 +101,7 @@
 </template>
 
 <script>
+import gsap, { Power2 } from 'gsap'
 import { mapMutations } from 'vuex'
 import Title from '../shared/vue-lib/src/stories/components/Title/Title.vue'
 import Paragraph from '../shared/vue-lib/src/stories/components/Paragraph/Paragraph.vue'
@@ -135,15 +136,12 @@ export default {
   mixins: [smoothScroll],
   transition: {
     leave(el, done) {
-      // gsap.to(el, {
-      //   duration: 0.5,
-      //   delay: 0.8,
-      //   opacity: 0,
-      //   ease: Power2.easeInOut,
-      // })
-      setTimeout(() => {
-        done()
-      }, 1000)
+      gsap.to(el, {
+        opacity: 0,
+        duration: 1,
+        ease: Power2.easeInOut,
+        onComplete: done,
+      })
     },
   },
   data() {
@@ -201,24 +199,6 @@ export default {
         firstText: false,
         secondText: false,
       }
-      // setTimeout(() => {
-      //   this.reveal.firstSubtitle = false
-      // }, 1300)
-      // setTimeout(() => {
-      //   this.reveal.firstSubtitleContent = false
-      // }, 1400)
-      // setTimeout(() => {
-      //   this.reveal.secondSubtitle = false
-      // }, 500)
-      // setTimeout(() => {
-      //   this.reveal.secondSubtitleContent = false
-      // }, 1500)
-      // setTimeout(() => {
-      //   this.reveal.firstText = false
-      // }, 1500)
-      // setTimeout(() => {
-      //   this.reveal.secondText = false
-      // }, 1700)
     },
   },
 }

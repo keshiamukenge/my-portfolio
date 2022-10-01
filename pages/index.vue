@@ -10,7 +10,12 @@
           <ImageElement
             ref="images"
             :src="project.image.url"
-            @click="SET_SELECTED_PROJECT({ id: activeProject?.id || 0 })"
+            @click="
+              () => {
+                SET_SELECTED_PROJECT({ id: activeProject?.id || 0 })
+                SET_DISABLE_ACTIVE_PROJECT()
+              }
+            "
           />
           <ProjectTitle>
             <Title
@@ -51,7 +56,7 @@
 </template>
 
 <script>
-import gsap, { Power2 } from 'gsap'
+import gsap from 'gsap'
 import { mapMutations, mapGetters } from 'vuex'
 import Title from '../shared/vue-lib/src/stories/components/Title/Title.vue'
 
@@ -85,25 +90,9 @@ export default {
   mixins: [smoothScroll],
   transition: {
     leave(el, done) {
-      if (this.$nuxt._route.name === 'About') {
-        gsap.to(el, {
-          duration: 0.5,
-          opacity: 0,
-          ease: Power2.easeInOut,
-        })
-        setTimeout(() => {
-          done()
-        }, 700)
-      } else {
-        gsap.to(el, {
-          duration: 0.5,
-          opacity: 0,
-          ease: Power2.easeInOut,
-        })
-        setTimeout(() => {
-          done()
-        }, 2200)
-      }
+      setTimeout(() => {
+        done()
+      }, 2200)
     },
   },
   data() {
@@ -163,16 +152,19 @@ export default {
       console.log(e)
     }
 
-    this.webgl = useWebGL({
-      viewportSize: this.viewport,
-      imageOptions: this.imagesOptions,
-      waterEffectOptions: {
-        size: 50,
-        radius: 50 * 0.9,
-        maxAge: 30,
-      },
-      textures: this.textures,
+    const canvas = document.querySelector('canvas')
+    gsap.to(canvas, {
+      opacity: 1,
+      duration: 0.5,
     })
+
+    this.SET_ENABLE_ACTIVE_PROJECT()
+
+    this.webgl = useWebGL()
+    this.webgl.textures = this.textures
+    this.webgl.imagesOptions = this.imagesOptions
+    this.webgl.sizes = this.viewport
+    this.webgl.updatePlaneCenteredPosition()
 
     window.addEventListener('wheel', (event) => {
       if (this.webgl.isRunning) return
@@ -185,11 +177,18 @@ export default {
     })
 
     window.addEventListener('resize', () => {
-      this.webgl.setPlaneCenteredPosition()
+      if (this.$route.name === 'index') {
+        this.webgl.updatePlaneCenteredPosition()
+      }
     })
   },
   methods: {
-    ...mapMutations(['SET_SELECTED_PROJECT', 'SET_PROJECTS_ORDER']),
+    ...mapMutations([
+      'SET_SELECTED_PROJECT',
+      'SET_PROJECTS_ORDER',
+      'SET_DISABLE_ACTIVE_PROJECT',
+      'SET_ENABLE_ACTIVE_PROJECT',
+    ]),
 
     setImageOptions({ image }) {
       this.imagesOptions = {

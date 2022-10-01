@@ -13,6 +13,7 @@
 import { mapMutations } from 'vuex'
 
 import { Header, Footer } from '../components/Essentials'
+import useWebGL from '@/hooks/useWebGL'
 
 export default {
   components: {
@@ -20,6 +21,8 @@ export default {
     Footer,
   },
   mounted() {
+    useWebGL()
+
     this.SET_VIEWPORT()
 
     window.addEventListener('resize', () => {

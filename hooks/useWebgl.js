@@ -12,26 +12,41 @@ import waterEffect from './utils/waterEffect'
 let webgl
 
 class WebGL {
-	constructor({ viewportSize, textures, imageOptions, waterEffectOptions }) {
-		this.sizes = viewportSize
+	constructor() {
+		this.sizes = {
+			width: window.innerWidth,
+			height: window.innerHeight,
+			aspect: window.innerWidth / window.innerHeight,
+		}
 		this.isRunning = false
 
-		this.previousTexture = textures.previous
-		this.selectedTexture = textures.selected
-		this.defaultTexture = textures.default
-		this.activeTexture = textures.active
+		this.textures = {
+			previous: null,
+			next: null,
+			active: null,
+			selected: null,
+			default: null
+		}
 
-		this.imagesOptions = imageOptions
-		this.waterEffectOptions = waterEffectOptions
+		this.imagesOptions = {
+			aspect: 1.25,
+			height: 1024,
+			width: 1280,
+		}
+		this.waterEffectOptions = {
+			size: 50,
+      radius: 50 * 0.9,
+      maxAge: 30,
+		}
 
 		this.setMousePosition({ waterEffectOptions: this.waterEffectOptions })
 		
-		this.initWebgl({ viewportSize, textures })
+		this.initWebgl()
 		this.update({ waterEffectOptions: this.waterEffectOptions })
 	}
 
 	// SETUP 3D SCENE
-	initWebgl({ textures }) {
+	initWebgl() {
 		this.waterTexture = initTexture()
 		this.clock = new THREE.Clock()
 
@@ -57,16 +72,6 @@ class WebGL {
 
 		// setup plane
 		this.geometry = new THREE.PlaneBufferGeometry(1, 1, 62, 62)
-
-		this.texture1 = () => {
-			if (this.selectedTexture) {
-				return new THREE.TextureLoader().load(this.selectedTexture)
-			} else if (this.previousTexture) {
-				return new THREE.TextureLoader().load(this.previousTexture)
-			} else {
-				return new THREE.TextureLoader().load(this.defaultTexture)
-			}
-		}
 
 		this.material = new THREE.ShaderMaterial({
 			side: THREE.DoubleSide,
@@ -161,11 +166,11 @@ class WebGL {
 				},
 				texture1: {
 					type: 'f',
-					value: new THREE.TextureLoader().load(textures.selected || textures.previous || textures.default),
+					value: new THREE.TextureLoader().load('images/cam-portfolio-project.jpeg'),
 				},
 				texture2: {
 					type: 'f',
-					value: new THREE.TextureLoader().load(textures.next),
+					value: new THREE.TextureLoader().load('images/cam-portfolio-project.jpeg'),
 				},
 				displacement: {
 					type: 'f',
@@ -183,8 +188,10 @@ class WebGL {
 		})
 		this.material.uniformsNeedUpdate = true
 		this.material.uniforms.texture1.matrixAutoUpdate = false
-
+		this.material.uniforms.texture2.matrixAutoUpdate = false
+		
 		this.plane = new THREE.Mesh(this.geometry, this.material)
+		this.plane.frustumCulled = false;
 		this.plane.scale.z = 1
 		this.setPlaneSize()
 
@@ -194,16 +201,6 @@ class WebGL {
 	}
 
 	// SETTERS
-	setPlaneCenteredPosition() {
-		window.addEventListener('resize', () => {
-			this.setPlaneSize()
-
-			this.camera.updateProjectionMatrix()
-
-			this.composer.setSize(this.sizes.width, this.sizes.height)
-		})
-	}
-
 	setPlaneSize() {
 		if (this.imagesOptions.aspect > this.sizes.aspect) {
 			this.plane.scale.x = this.imagesOptions.aspect / this.sizes.aspect / 2.8
@@ -251,6 +248,22 @@ class WebGL {
 	}
 
 	// ANIMATIONS AND TRANSITIONS
+	updatePlaneCenteredPosition() {
+		this.setPlaneSize()
+		this.camera.updateProjectionMatrix()
+		this.composer.setSize(this.sizes.width, this.sizes.height)
+	}
+
+	updatePlaneCoverWindowSize() {
+		if (this.imagesOptions.aspect > this.sizes.aspect) {
+			this.plane.scale.x = this.imagesOptions.aspect / this.sizes.aspect
+			this.plane.scale.y = 1
+		} else {
+			this.plane.scale.x = 1
+			this.plane.scale.y = this.sizes.aspect / this.imagesOptions.aspect
+		}
+	}
+
 	scaleUpPlaneCoverWindowSize() {
 		if (this.imagesOptions.aspect > this.sizes.aspect) {
 			gsap.to(this.plane.scale, {
@@ -269,9 +282,27 @@ class WebGL {
 		}
 	}
 
+	scaleDownPlaneCenteredPosition({ viewportOptions }) {
+		const aspect = 1.25
+		if (viewportOptions.aspect < aspect) {
+			gsap.to(this.plane.scale, {
+				x: aspect / viewportOptions.aspect / 2.8,
+				y: 1 / 2.3,
+				duration: 1.7,
+				ease: Power2.easeInOut,
+			})
+		} else {
+			gsap.to(this.plane.scale, {
+				x: 1 / 2.8,
+				y: viewportOptions.aspect / aspect / 2.3,
+				duration: 1.7,
+				ease: Power2.easeInOut,
+			})
+		}
+	}
+
 	startWebglTransition({ textures }) {
 		if (this.isRunning) return
-
 
 		this.isRunning = true
 		this.material.uniforms.texture2.value = new THREE.TextureLoader().load(textures.active)
@@ -288,8 +319,8 @@ class WebGL {
 	}
 }
 
-const useWebGL = ({ viewportSize, textures, imageOptions, waterEffectOptions }) => {
-	return webgl || (webgl = new WebGL({ viewportSize, textures, imageOptions, waterEffectOptions }))
+const useWebGL = () => {
+	return webgl || (webgl = new WebGL())
 }
 
 export default useWebGL

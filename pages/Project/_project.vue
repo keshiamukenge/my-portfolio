@@ -211,7 +211,7 @@
 </template>
 
 <script>
-import gsap, { Power2 } from 'gsap'
+import gsap from 'gsap'
 import { mapGetters } from 'vuex'
 import Intersect from 'vue-intersect'
 import Title from '../../shared/vue-lib/src/stories/components/Title/Title.vue'
@@ -263,28 +263,6 @@ export default {
     ContainerProjectInformationsContent,
   },
   mixins: [smoothScroll],
-  transition: {
-    leave(el, done) {
-      gsap.to(el, {
-        duration: 0.5,
-        delay: 0.8,
-        opacity: 0,
-        ease: Power2.easeInOut,
-      })
-      // gsap.to(canvas, {
-      //   duration: 0.5,
-      //   delay: 0.6,
-      //   opacity: 0,
-      //   ease: Power2.easeInOut,
-      //   onComplete: () => {
-      //     done()
-      //   },
-      // })
-      setTimeout(() => {
-        done()
-      }, 2700)
-    },
-  },
   data() {
     return {
       titleFont: fonts.titleFont,
@@ -301,6 +279,11 @@ export default {
         el: null,
         appearLink: false,
       },
+      imagesOptions: {
+        width: 0,
+        height: 0,
+        aspect: 0,
+      },
     }
   },
   computed: {
@@ -313,18 +296,45 @@ export default {
       viewport: 'GET_VIEWPORT',
     }),
   },
+  watch: {
+    selectedProject() {
+      this.imagesOptions = this.selectedProject.image
+    },
+  },
   async mounted() {
     try {
       await this.$store.dispatch('fetchProjectsData')
-      console.log(this.selectedProject)
     } catch (e) {
       console.log(e)
     }
 
     this.websiteImage.el = this.$refs.websiteImage.$el
-    console.log(useWebGL())
+
+    this.webgl = useWebGL()
+    this.webgl.imagesOptions.width = this.selectedProject.image.width
+    this.webgl.imagesOptions.height = this.selectedProject.image.height
+    this.webgl.imagesOptions.aspect =
+      this.selectedProject.image.width / this.selectedProject.image.height
+    this.webgl.sizes = this.viewport
+
+    window.addEventListener('resize', () => {
+      this.webgl.updatePlaneCoverWindowSize()
+    })
+  },
+  async beforeDestroy() {
+    if (this.$route.name === 'index') {
+      this.webgl.scaleDownPlaneCenteredPosition({
+        viewportOptions: this.viewport,
+      })
+    }
+
+    await this.disappearCanvas()
   },
   methods: {
+    resizePlane() {
+      const { setPlaneCenteredPosition } = useWebGL()
+      setPlaneCenteredPosition()
+    },
     // INTERACTIONS
     activeWebsiteLink() {
       setTimeout(() => {
@@ -348,6 +358,14 @@ export default {
       gsap.to(this.websiteImage.el, {
         opacity: 1,
         duration: 0.3,
+      })
+    },
+    disappearCanvas() {
+      if (this.$route.name !== 'About') return
+      const canvas = document.querySelector('canvas')
+      gsap.to(canvas, {
+        opacity: 0,
+        duration: 0.5,
       })
     },
   },
