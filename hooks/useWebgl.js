@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { EffectPass, EffectComposer, RenderPass } from 'postprocessing'
-import gsap, { Power2 } from 'gsap'
+import gsap, { Power2, Power4 } from 'gsap'
 import * as dat from 'dat.gui'
 
 import { PerspectiveCamera } from 'three'
@@ -39,6 +39,12 @@ class WebGL {
 			size: 50,
       radius: 50 * 0.9,
       maxAge: 30,
+		}
+
+		this.scrollOptions = {
+			current: 0,
+			target: 0,
+			ease: 0.75
 		}
 
 		this.gui = new dat.GUI()
@@ -201,51 +207,126 @@ class WebGL {
 		this.initComposer()
 	}
 
-	initSecondWebgl({ images }) {
+	initSecondWebgl() {
+		this.offset = new THREE.Vector2(0.0, 0.0)
 		this.scene2 = new THREE.Scene()
+		this.canvas2 = document.querySelector('canvas.second-webgl')
+		this.sizes2 = {
+			width: this.canvas2.getBoundingClientRect().width,
+			height: this.canvas2.getBoundingClientRect().height,
+		}
 		
-		this.camera2 = new PerspectiveCamera(70, this.sizes.width / this.sizes.height, 100, 2000)
-		this.camera2.position.set(1, 1, 100)
-		this.gui.add(this.camera2.position, 'z', 0, 1000, 0.01).name('cameraZ')
-		// this.camera2.lookAt()
+		this.camera2 = new PerspectiveCamera(70,  this.sizes2.width / this.sizes2.height, 100, 2000)
+		this.camera2.position.z = 600;
+		this.camera2.fov = 2 * Math.atan((this.sizes2.height / 2) / 600 ) * (180 / Math.PI);
+		this.camera2.updateProjectionMatrix()
 
 		this.renderer2 = new THREE.WebGLRenderer({
 			alpha: true,
 			antialias: false,
-			canvas: document.querySelector('canvas.second-webgl'),
+			canvas: this.canvas2,
 		})
-		// this.renderer2.setSize(this.sizes.width, this.sizes.height)
-		console.log(images)
+		this.renderer2.setPixelRatio(Math.min(window.devicePixelRatio,2))
+		this.renderer2.setSize( this.sizes2.width, this.sizes2.height );
 
-		if(images[0] !== null) {
-			this.imageParameters = images.map(image => {
-				const bounds = image.getBoundingClientRect()
-		
-				this.geometry2 = new THREE.PlaneBufferGeometry(image.width, image.height, 8, 8)
-				
-				this.material2 = new THREE.MeshBasicMaterial({
-					side: THREE.DoubleSide,
-					map: new THREE.TextureLoader().load(image.src)
-				});
-				this.material2.clone();
-				this.material2.uniformsNeedUpdate = true;
+	}
 
-				
-				this.plane2 = new THREE.Mesh(this.geometry2, this.material2);
-				this.camera2.lookAt(this.plane2)
-				
-				this.scene2.add(this.plane2);
-				
-				return {
-					image,
-					mesh: this.plane2,
-					top: bounds.top,
-					left: bounds.left,
-					width: bounds.width,
-					height: bounds.height,
-				};
-			})
-		}
+	// DEBUG GUI
+	addGui() {
+		this.gui.add(this.camera2.position, 'z', 0, 1000, 1).name('cameraZ')
+	}
+
+	createProjectsPlanes({ images }) {
+		if(images[0] === null) return
+
+		this.material2 = new THREE.ShaderMaterial({
+			uniforms: {
+				Mouse: {
+					value: this.mousePosition,
+				},
+				uOffset: {
+					value: new THREE.Vector2(0.0, 0.0),
+				},
+				uAlpha: {
+					value: 1,
+				},
+				uTexture: {
+					value: null,
+				},
+			},
+			side: THREE.DoubleSide,
+			fragmentShader: `
+				uniform sampler2D uTexture;
+				uniform vec2 uOffset;
+        uniform float uAlpha;
+
+        varying vec2 vUv;
+        
+				void main() {
+          vec3 texture = texture2D(uTexture,vUv).rgb;
+          gl_FragColor = vec4(texture, uAlpha);
+        }
+			`,
+			vertexShader: `
+				uniform vec2 uOffset;
+
+        varying vec2 vUv;
+
+        float PI = 3.1415926535897932384626433832795;
+
+        vec3 deformationCurve(vec3 position, vec2 uv, vec2 offset) {
+          position.x = position.x + (sin(uv.y * PI) * offset.x);
+          position.y = position.y + (sin(uv.x * PI) * offset.y);
+          return position;
+        }
+
+        void main() {
+          vUv =  uv + (uOffset * 0.003);
+          vec3 newPosition = position;
+          newPosition = deformationCurve(position, uv, uOffset);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+        }
+			`,
+		})
+
+		this.materials2 = []
+
+		this.imageParameters = images.map(image => {
+			const bounds = image.getBoundingClientRect()
+	
+			this.geometry2 = new THREE.PlaneBufferGeometry(bounds.width, bounds.height, 16, 16)
+			const texture = new THREE.TextureLoader().load(image.src)
+			texture.needsUpdate = true;
+
+			const material = this.material2.clone();
+			material.uniforms.uTexture.value = new THREE.TextureLoader().load(image.src);
+			material.uniforms.uTexture.value.needsUpdate = true;
+			material.uniformsNeedUpdate = true
+			this.materials2.push(material)
+			// this.material2.clone();
+			// this.material2.map.needsUpdate = true
+			
+			this.plane2 = new THREE.Mesh(this.geometry2, material)
+			// this.setOffset({
+			// 	width: bounds.width,
+			// 	left: bounds.left,
+			// 	top: bounds.top,
+			// 	height: bounds.height,
+			// })
+			// this.plane2.position.set(this.offset.x, this.offset.y, 0)
+			// this.camera2.lookAt(this.plane3)
+			
+			this.scene2.add(this.plane2)
+
+			return {
+				image,
+				mesh: this.plane2,
+				top: bounds.top,
+				left: bounds.left,
+				width: bounds.width,
+				height: bounds.height,
+			};
+		})
 	}
 
 	// SETTERS
@@ -258,6 +339,11 @@ class WebGL {
 			this.plane.scale.y = this.sizes.aspect / this.imagesOptions.aspect / 2.3
 		}
 	}
+
+	setProjectPlanesPositions({ plane, image }) {
+		plane.position.y = -image.top + this.sizes2.height / 2 - image.height / 2
+		plane.position.x = image.left - this.sizes2.width / 2 + image.width / 2
+  }
 
 	setMousePosition({ waterEffectOptions }) {
 		window.addEventListener('mousemove', (event) => {
@@ -274,6 +360,10 @@ class WebGL {
 		})
 	}
 
+	setOffset({ width, left, top, height }) {
+		this.offset.set(left - window.innerWidth / 2 + width / 2, -top + window.innerHeight / 2 - height / 2); 
+	}
+
 	updateFirstWebgl() {
 		requestAnimationFrame(() => this.updateFirstWebgl())
 		updatePoints({
@@ -286,16 +376,20 @@ class WebGL {
 
 	updateSecondWebgl() {
 		requestAnimationFrame(() => this.updateSecondWebgl())
-			this.setProjectsPlanesPositions()
-		// this.material2.uniformsNeedUpdate = true
-	}
 
-	setProjectsPlanesPositions() {
-    this.imageParameters.forEach(image => {
-      image.mesh.position.y = -image.top + this.sizes.height / 2 - image.height / 2;
-      image.mesh.position.x = image.left - this.sizes.width / 2 + image.width / 2;
-    });
-  }
+		// window.addEventListener('wheel', (event) => {
+		// 	this.imageParameters.forEach(image => {
+		// 		this.updatePlaneDeformationCurve({
+		// 			deltaY: event.deltaY,
+		// 			uOffset: image.mesh.material.uniforms.uOffset.value,
+		// 			imageSize: image
+		// 		})
+		// 		image.mesh.material.uniformsNeedUpdate = true
+		// 	})
+		// })
+
+		this.renderer2.render(this.scene2, this.camera2)
+	}
 
 	// SETUP POST PROCESSING
 	initComposer() {
@@ -309,6 +403,10 @@ class WebGL {
 	}
 
 	// ANIMATIONS AND TRANSITIONS
+	lerp(start, end, t) {
+		return start * (1 - t) + end * t
+	}
+	
 	updatePlaneCenteredPosition() {
 		this.setPlaneSize()
 		this.camera.updateProjectionMatrix()
@@ -376,6 +474,19 @@ class WebGL {
 				this.material.uniforms.progress.value = 0
 				this.isRunning = false
 			},
+		})
+	}
+
+	updatePlaneDeformationCurve({ uOffset, deltaY, imageSize }) {
+		deltaY *= 0.003;
+		gsap.to(uOffset, {
+			y: deltaY.map(
+					-1,
+						1,
+						-imageSize.height / 2,
+						imageSize.height / 2
+					),
+					ease: Power4.easeOut,
 		})
 	}
 }

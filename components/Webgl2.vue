@@ -14,14 +14,21 @@ export default {
       required: true,
     },
   },
+  // watch: {
+  //   images() {
+  //     if (this.$props.images[0] !== null) {
+  //       this.webgl?.createProjectsPlanes({ images: [this.$props.images] })
+  //     }
+  //   },
+  // },
   mounted() {
     this.webgl = useWebGL()
-    console.log(this.webgl)
-    this.webgl.initSecondWebgl({ images: this.$props.images })
+    this.webgl.initSecondWebgl()
+    this.webgl.updateSecondWebgl()
 
-    if (this.$props.images[0] !== null) {
-      this.webgl.updateSecondWebgl()
-    }
+    // if (this.$props.images[0] !== null) {
+    //   this.webgl.updateSecondWebgl()
+    // }
   },
 }
 </script>

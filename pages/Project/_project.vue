@@ -304,6 +304,8 @@ export default {
     this.webgl.imagesOptions.aspect =
       this.selectedProject.image.width / this.selectedProject.image.height
     this.webgl.sizes = this.viewport
+    this.webgl.createProjectsPlanes({ images: [this.websiteImage.el] })
+    console.log(this.webgl)
 
     window.addEventListener('resize', () => {
       this.webgl.updatePlaneCoverWindowSize()
@@ -319,12 +321,12 @@ export default {
     await this.disappearProjectInformations()
     await this.disappearCanvas()
   },
-  updated() {
-    if (this.websiteImage.el) {
-      this.webgl?.initSecondWebgl({ images: [this.websiteImage.el] })
-      console.log(this.webgl)
-    }
-  },
+  // updated() {
+  //   if (this.websiteImage.el) {
+  //     this.webgl?.createProjectsPlanes({ images: [this.websiteImage.el] })
+  //     // console.log(this.webgl)
+  //   }
+  // },
   methods: {
     ...mapMutations(['DISABLE_ACTIVE_TITLE']),
     resizePlane() {
@@ -346,7 +348,7 @@ export default {
     },
     appearImage() {
       gsap.to(this.websiteImage.el, {
-        opacity: 1,
+        opacity: 0,
         duration: 0.3,
       })
     },
