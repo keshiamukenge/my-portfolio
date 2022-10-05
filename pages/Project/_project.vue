@@ -1,5 +1,5 @@
 <template>
-  <PageContainer data-scroll>
+  <PageContainer ref="pageContainer" data-scroll>
     <MainContainer>
       <ContainerProjectInformationsSection>
         <ContainerProjectInformationsIntroduction>
@@ -175,36 +175,16 @@
               </Informations>
             </ContainerProjectInformations>
           </ContainerProjectDescription>
-          <ContainerImageWebsite
-            @mouseenter="activeWebsiteLink"
-            @mouseleave="disableWebsiteLink"
-          >
-            <ImageWebsiteLink
-              :href="selectedProject.website.url"
-              target="_blank"
-            >
-              <ViewSiteText>
-                <Title
-                  text="Visit Website"
-                  title-class="website-link-text"
-                  :reveal="websiteImage.appearLink"
-                  :font-color="textColor"
-                  font-size="1rem"
-                  split-characters="lines"
-                  :font="bodyFont"
-                  :duration="0.5"
-                  :animation="1"
-                />
-              </ViewSiteText>
-              <intersect :threshold="[0.9]" @enter.once="appearImage">
-                <ImageElement
-                  ref="websiteImage"
-                  :src="selectedProject.website.image.url"
-                />
-              </intersect>
-            </ImageWebsiteLink>
+          <ContainerImageWebsite data-scroll data-scroll-speed="1">
+            <intersect :threshold="[0.9]" @enter.once="appearImage">
+              <ImageElement
+                ref="websiteImage"
+                :src="selectedProject.website.image.url"
+              />
+            </intersect>
           </ContainerImageWebsite>
         </ContainerProjectInformationsContent>
+        <Webgl2 :images="[websiteImage?.el]" />
       </ContainerProjectInformationsSection>
     </MainContainer>
   </PageContainer>
@@ -218,6 +198,7 @@ import Title from '../../shared/vue-lib/src/stories/components/Title/Title.vue'
 import Paragraph from '../../shared/vue-lib/src/stories/components/Paragraph/Paragraph.vue'
 
 import { colors, fonts } from '../../theme'
+import Webgl2 from '../../components/Webgl2'
 import {
   PageContainer,
   MainContainer,
@@ -232,9 +213,7 @@ import {
   ContainerProjectInformationsIntroduction,
   ContainerProjectInformationsContent,
   ContainerImageWebsite,
-  ViewSiteText,
   ImageElement,
-  ImageWebsiteLink,
 } from './styledComponents'
 import smoothScroll from '@/mixins/smoothScroll'
 import useWebGL from '@/hooks/useWebGL'
@@ -248,9 +227,7 @@ export default {
     ContainerProjectInformationsSection,
     ContainerProjectDescription,
     ContainerImageWebsite,
-    ViewSiteText,
     ImageElement,
-    ImageWebsiteLink,
     Subtitle,
     Informations,
     ContainerProjectInformations,
@@ -261,13 +238,14 @@ export default {
     ContainerSpanElement,
     ContainerProjectInformationsIntroduction,
     ContainerProjectInformationsContent,
+    Webgl2,
   },
   mixins: [smoothScroll],
   transition: {
     leave(el, done) {
       setTimeout(() => {
         done()
-      }, 1000)
+      }, 500)
     },
   },
   data() {
@@ -282,6 +260,7 @@ export default {
         thirdSection: false,
         fourthSection: false,
       },
+      pageContainer: null,
       websiteImage: {
         el: null,
         appearLink: false,
@@ -315,6 +294,8 @@ export default {
       console.log(e)
     }
 
+    this.pageContainer = this.$refs.pageContainer.$el
+    this.appearProjectInformations()
     this.websiteImage.el = this.$refs.websiteImage.$el
 
     this.webgl = useWebGL()
@@ -334,32 +315,33 @@ export default {
         viewportOptions: this.viewport,
       })
     }
-
+    this.DISABLE_ACTIVE_TITLE()
+    await this.disappearProjectInformations()
     await this.disappearCanvas()
   },
+  updated() {
+    if (this.websiteImage.el) {
+      this.webgl?.initSecondWebgl({ images: [this.websiteImage.el] })
+      console.log(this.webgl)
+    }
+  },
   methods: {
-    ...mapMutations(['SET_DISABLE_ACTIVE_TITLE']),
+    ...mapMutations(['DISABLE_ACTIVE_TITLE']),
     resizePlane() {
       const { setPlaneCenteredPosition } = useWebGL()
       setPlaneCenteredPosition()
     },
     // INTERACTIONS
-    activeWebsiteLink() {
-      setTimeout(() => {
-        this.websiteImage.appearLink = true
-      }, 400)
-
-      gsap.to(this.websiteImage.el, {
-        opacity: 0.2,
+    disappearProjectInformations() {
+      gsap.to(this.pageContainer, {
         duration: 0.3,
+        opacity: 0,
       })
     },
-    disableWebsiteLink() {
-      this.websiteImage.appearLink = false
-      gsap.to(this.websiteImage.el, {
-        opacity: 1,
-        delay: 0.5,
+    appearProjectInformations() {
+      gsap.to(this.pageContainer, {
         duration: 0.3,
+        opacity: 1,
       })
     },
     appearImage() {
@@ -373,7 +355,7 @@ export default {
       const canvas = document.querySelector('canvas')
       gsap.to(canvas, {
         opacity: 0,
-        duration: 0.5,
+        duration: 0.3,
       })
     },
   },

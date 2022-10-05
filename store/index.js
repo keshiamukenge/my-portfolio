@@ -60,9 +60,6 @@ export const mutations = {
       state.projectsOrder.active = state.projectsData[state.activeId]
       state.projectsOrder.next = state.projectsData[nextId]
     }
-
-    // state.projectsOrder.active.value.revealTitle = state.projectsOrder.active.value.revealPagination = true
-    // state.projectsOrder.previous.value.revealTitle = state.projectsOrder.previous.value.revealPagination = false
   },
   SET_DISABLE_ACTIVE_PROJECT(state) {
     if(state.selectedProject?.value) {
@@ -92,22 +89,24 @@ export const mutations = {
   },
 
 
-  SET_DISABLE_PREVIOUS_TITLE(state) {
+  DISABLE_PREVIOUS_TITLE(state) {
     if(state.projectsOrder.previous) {
       state.projectsOrder.previous.value.revealTitle = state.projectsOrder.previous.value.revealPagination = false
     }
   },
-  SET_ENABLE_PREVIOUS_TITLE(state) {
+  ENABLE_PREVIOUS_TITLE(state) {
     if(state.projectsOrder.previous) {
       state.projectsOrder.previous.value.revealTitle = state.projectsOrder.previous.value.revealPagination = true
     }
   },
-  SET_ENABLE_ACTIVE_TITLE(state) {
+  ENABLE_ACTIVE_TITLE(state) {
     if(state.projectsOrder.active) {
       state.projectsOrder.active.value.revealTitle = state.projectsOrder.active.value.revealPagination = true
+    } else {
+      state.projectsData[0].value.revealTitle = state.projectsData[0].value.revealPagination = true
     }
   },
-  SET_DISABLE_ACTIVE_TITLE(state) {
+  DISABLE_ACTIVE_TITLE(state) {
     if(state.projectsOrder.active) {
       state.projectsOrder.active.value.revealTitle = state.projectsOrder.active.value.revealPagination = false
     }

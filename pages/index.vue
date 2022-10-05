@@ -13,7 +13,7 @@
             @click="
               () => {
                 SET_SELECTED_PROJECT({ id: activeProject?.id || 0 })
-                SET_DISABLE_ACTIVE_TITLE()
+                DISABLE_ACTIVE_TITLE()
               }
             "
           />
@@ -166,7 +166,7 @@ export default {
       duration: 0.5,
     })
 
-    this.SET_ENABLE_ACTIVE_TITLE()
+    this.ENABLE_ACTIVE_TITLE()
 
     this.webgl = useWebGL()
     this.webgl.textures = this.textures
@@ -174,19 +174,7 @@ export default {
     this.webgl.sizes = this.viewport
     this.webgl.updatePlaneCenteredPosition()
 
-    window.addEventListener('wheel', (event) => {
-      if (this.webgl.isRunning) return
-
-      if (event.deltaY > 0) {
-        this.SET_PROJECTS_ORDER({ direction: 1 })
-        this.SET_ENABLE_ACTIVE_TITLE()
-        this.SET_DISABLE_PREVIOUS_TITLE()
-      } else {
-        this.SET_PROJECTS_ORDER({ direction: 0 })
-        this.SET_ENABLE_ACTIVE_TITLE()
-        this.SET_DISABLE_PREVIOUS_TITLE()
-      }
-    })
+    window.addEventListener('wheel', this.onWheel)
 
     window.addEventListener('resize', () => {
       if (this.$route.name === 'index') {
@@ -196,17 +184,30 @@ export default {
   },
   async beforeDestroy() {
     await this.disappearCanvas()
+    await window.removeEventListener('wheel', this.onWheel)
   },
   methods: {
     ...mapMutations([
       'SET_SELECTED_PROJECT',
       'SET_PROJECTS_ORDER',
-      'SET_DISABLE_PREVIOUS_TITLE',
-      'SET_DISABLE_ACTIVE_TITLE',
-      'SET_ENABLE_PREVIOUS_TITLE',
-      'SET_ENABLE_ACTIVE_TITLE',
+      'DISABLE_PREVIOUS_TITLE',
+      'DISABLE_ACTIVE_TITLE',
+      'ENABLE_PREVIOUS_TITLE',
+      'ENABLE_ACTIVE_TITLE',
     ]),
+    onWheel(event) {
+      if (this.webgl.isRunning) return
 
+      if (event.deltaY > 0) {
+        this.SET_PROJECTS_ORDER({ direction: 1 })
+        this.ENABLE_ACTIVE_TITLE()
+        this.DISABLE_PREVIOUS_TITLE()
+      } else {
+        this.SET_PROJECTS_ORDER({ direction: 0 })
+        this.ENABLE_ACTIVE_TITLE()
+        this.DISABLE_PREVIOUS_TITLE()
+      }
+    },
     setImageOptions({ image }) {
       this.imagesOptions = {
         width: image.width,

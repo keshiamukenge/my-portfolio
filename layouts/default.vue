@@ -5,7 +5,7 @@
       <Nuxt />
     </main>
     <Footer />
-    <canvas></canvas>
+    <canvas class="main-webgl"></canvas>
   </div>
 </template>
 
@@ -21,7 +21,9 @@ export default {
     Footer,
   },
   mounted() {
-    useWebGL()
+    this.webgl = useWebGL()
+    this.webgl.initFirstWebgl()
+    this.webgl.updateFirstWebgl()
 
     this.SET_VIEWPORT()
 

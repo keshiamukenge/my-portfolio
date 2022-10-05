@@ -1,7 +1,9 @@
 import * as THREE from 'three'
 import { EffectPass, EffectComposer, RenderPass } from 'postprocessing'
 import gsap, { Power2 } from 'gsap'
+import * as dat from 'dat.gui'
 
+import { PerspectiveCamera } from 'three'
 import {
   initTexture,
   addPoint,
@@ -39,14 +41,13 @@ class WebGL {
       maxAge: 30,
 		}
 
+		this.gui = new dat.GUI()
+
 		this.setMousePosition({ waterEffectOptions: this.waterEffectOptions })
-		
-		this.initWebgl()
-		this.update({ waterEffectOptions: this.waterEffectOptions })
 	}
 
-	// SETUP 3D SCENE
-	initWebgl() {
+	// SETUP 3D SCENES
+	initFirstWebgl() {
 		this.waterTexture = initTexture()
 		this.clock = new THREE.Clock()
 
@@ -64,7 +65,7 @@ class WebGL {
 		this.renderer = new THREE.WebGLRenderer({
 			alpha: true,
 			antialias: false,
-			canvas: document.querySelector('canvas'),
+			canvas: document.querySelector('canvas.main-webgl'),
 		})
 		this.renderer.setSize(this.sizes.width, this.sizes.height)
 
@@ -174,7 +175,7 @@ class WebGL {
 				},
 				displacement: {
 					type: 'f',
-					value: new THREE.TextureLoader().load('textures/disp1.jpeg'),
+					value: new THREE.TextureLoader().load('textures/disp2.jpeg'),
 				},
 				resolution: {
 					type: 'v4',
@@ -198,6 +199,53 @@ class WebGL {
 		this.scene.add(this.plane)
 
 		this.initComposer()
+	}
+
+	initSecondWebgl({ images }) {
+		this.scene2 = new THREE.Scene()
+		
+		this.camera2 = new PerspectiveCamera(70, this.sizes.width / this.sizes.height, 100, 2000)
+		this.camera2.position.set(1, 1, 100)
+		this.gui.add(this.camera2.position, 'z', 0, 1000, 0.01).name('cameraZ')
+		// this.camera2.lookAt()
+
+		this.renderer2 = new THREE.WebGLRenderer({
+			alpha: true,
+			antialias: false,
+			canvas: document.querySelector('canvas.second-webgl'),
+		})
+		// this.renderer2.setSize(this.sizes.width, this.sizes.height)
+		console.log(images)
+
+		if(images[0] !== null) {
+			this.imageParameters = images.map(image => {
+				const bounds = image.getBoundingClientRect()
+		
+				this.geometry2 = new THREE.PlaneBufferGeometry(image.width, image.height, 8, 8)
+				
+				this.material2 = new THREE.MeshBasicMaterial({
+					side: THREE.DoubleSide,
+					map: new THREE.TextureLoader().load(image.src)
+				});
+				this.material2.clone();
+				this.material2.uniformsNeedUpdate = true;
+
+				
+				this.plane2 = new THREE.Mesh(this.geometry2, this.material2);
+				this.camera2.lookAt(this.plane2)
+				
+				this.scene2.add(this.plane2);
+				
+				return {
+					image,
+					mesh: this.plane2,
+					top: bounds.top,
+					left: bounds.left,
+					width: bounds.width,
+					height: bounds.height,
+				};
+			})
+		}
 	}
 
 	// SETTERS
@@ -226,15 +274,28 @@ class WebGL {
 		})
 	}
 
-	update({ waterEffectOptions}) {
-		requestAnimationFrame(() => this.update({ waterEffectOptions }))
+	updateFirstWebgl() {
+		requestAnimationFrame(() => this.updateFirstWebgl())
 		updatePoints({
-			maxAge: waterEffectOptions.maxAge,
-			radius: waterEffectOptions.radius,
+			maxAge: this.waterEffectOptions.maxAge,
+			radius: this.waterEffectOptions.radius,
 		})
 		this.material.uniformsNeedUpdate = true
 		this.composer.render(this.clock.getDelta())
 	}
+
+	updateSecondWebgl() {
+		requestAnimationFrame(() => this.updateSecondWebgl())
+			this.setProjectsPlanesPositions()
+		// this.material2.uniformsNeedUpdate = true
+	}
+
+	setProjectsPlanesPositions() {
+    this.imageParameters.forEach(image => {
+      image.mesh.position.y = -image.top + this.sizes.height / 2 - image.height / 2;
+      image.mesh.position.x = image.left - this.sizes.width / 2 + image.width / 2;
+    });
+  }
 
 	// SETUP POST PROCESSING
 	initComposer() {

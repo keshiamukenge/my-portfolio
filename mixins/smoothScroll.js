@@ -10,6 +10,9 @@ export default {
 			offset: [20, 0],
 		})
 	},
+	updated() {
+		this.scroll.update()
+	},
 	destroyed() {
 		this.scroll.destroy()
 	},

@@ -44,12 +44,23 @@ html {
       line-height: 25px;
     }
   }
-  canvas {
+  canvas.main-webgl {
     position: fixed;
     top: 0;
     left: 0;
     z-index: -1;
     opacity: 0;
+  }
+
+  canvas.second-webgl {
+    height: 100%;
+    z-index: 1;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
   }
 
   span.c-scrollbar_thumb {
