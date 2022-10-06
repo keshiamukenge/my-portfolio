@@ -16,21 +16,33 @@ export const MainContainer = styled.div`
 	height: auto;
 	display: flex;
 	flex-direction: column;
-	background-color: ${colors.black};
-	z-index: 2;
+	z-index: 0;
 	position: relative;
+`
+
+export const Background = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: ${colors.black};
+  top: 0;
+  left: 0;
+  z-index: -1;
+  bottom: 0;
+  right: 0;
 `
 
 export const ContainerImage = styled.div`
   width: 100%;
-  height: 50%;
+  height: auto;
 `
 
 export const ImageElement = styled.img`
   width: 100%;
-  height: 100%;
+  height: 500px;
   object-fit: cover;
   opacity: 0;
+  margin-bottom: 6rem;
 `
 
 export const ContainerImageWebsite = styled.div`

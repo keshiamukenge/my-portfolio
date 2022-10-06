@@ -18,7 +18,7 @@ export const state = {
     height: 0,
     aspect: 0
   },
-  scrollOptions: null
+  scrollInstance: null
 }
 
 export const getters = {
@@ -28,7 +28,7 @@ export const getters = {
   GET_NEXT_PROJECT: (state) => state.projectsOrder.next,
   GET_SELECTED_PROJECT: (state) => state.selectedProject,
   GET_VIEWPORT: (state) => state.viewport,
-  GET_SCROLL_OPTIONS: (state) => state.scrollOptions,
+  GET_SCROLL_INSTANCE: (state) => state.scrollInstance,
 }
 
 export const mutations = {
@@ -90,8 +90,8 @@ export const mutations = {
     state.selectedProject = state.projectsData[id]
   },
 
-  SET_SCROLL_OPTIONS(state, { scroll }) {
-    state.scrollOptions = scroll
+  SET_SCROLL_INSTANCE(state, { scrollInstance }) {
+    state.scrollInstance = scrollInstance
   },
 
 

@@ -1,6 +1,6 @@
 <template>
   <PageContainer ref="pageContainer" data-scroll>
-    <MainContainer>
+    <MainContainer class="container-project-information">
       <ContainerProjectInformationsSection>
         <ContainerProjectInformationsIntroduction>
           <ProjectTitle>
@@ -175,16 +175,29 @@
               </Informations>
             </ContainerProjectInformations>
           </ContainerProjectDescription>
-          <ContainerImageWebsite data-scroll data-scroll-speed="1">
-            <intersect :threshold="[0.9]" @enter.once="appearImage">
-              <ImageElement
-                ref="websiteImage"
-                :src="selectedProject.website.image.url"
-              />
-            </intersect>
+          <ContainerImageWebsite>
+            <ImageElement
+              ref="websiteImage"
+              :src="selectedProject.website.image.url"
+              data-scroll
+            />
+            <ImageElement
+              ref="img1"
+              src="images/cam-portfolio-project.jpeg"
+              data-scroll
+            />
+            <ImageElement
+              ref="img2"
+              src="images/sff-project.jpeg"
+              data-scroll
+            />
+            <ImageElement
+              ref="img3"
+              src="images/out-of-school-project.jpeg"
+              data-scroll
+            />
           </ContainerImageWebsite>
         </ContainerProjectInformationsContent>
-        <Webgl2 :images="[websiteImage?.el]" />
       </ContainerProjectInformationsSection>
     </MainContainer>
   </PageContainer>
@@ -198,7 +211,6 @@ import Title from '../../shared/vue-lib/src/stories/components/Title/Title.vue'
 import Paragraph from '../../shared/vue-lib/src/stories/components/Paragraph/Paragraph.vue'
 
 import { colors, fonts } from '../../theme'
-import Webgl2 from '../../components/Webgl2'
 import {
   PageContainer,
   MainContainer,
@@ -238,7 +250,6 @@ export default {
     ContainerSpanElement,
     ContainerProjectInformationsIntroduction,
     ContainerProjectInformationsContent,
-    Webgl2,
   },
   mixins: [smoothScroll],
   transition: {
@@ -261,9 +272,11 @@ export default {
         fourthSection: false,
       },
       pageContainer: null,
-      websiteImage: {
-        el: null,
-        appearLink: false,
+      projectImages: {
+        websiteImage: null,
+        img1: null,
+        img2: null,
+        img3: null,
       },
       imagesOptions: {
         width: 0,
@@ -296,19 +309,41 @@ export default {
 
     this.pageContainer = this.$refs.pageContainer.$el
     this.appearProjectInformations()
-    this.websiteImage.el = this.$refs.websiteImage.$el
+    this.projectImages.websiteImage = this.$refs.websiteImage.$el
+    this.projectImages.img1 = this.$refs.img1.$el
+    this.projectImages.img2 = this.$refs.img2.$el
+    this.projectImages.img3 = this.$refs.img3.$el
 
+    // First webgl scene
     this.webgl = useWebGL()
     this.webgl.imagesOptions.width = this.selectedProject.image.width
     this.webgl.imagesOptions.height = this.selectedProject.image.height
     this.webgl.imagesOptions.aspect =
       this.selectedProject.image.width / this.selectedProject.image.height
     this.webgl.sizes = this.viewport
-    this.webgl.createProjectsPlanes({ images: [this.websiteImage.el] })
-    console.log(this.webgl)
+
+    // Second webgl scene
+    this.webgl.initSecondWebgl()
+    this.webgl.createProjectsPlanes({
+      images: [
+        this.projectImages.websiteImage,
+        this.projectImages.img1,
+        this.projectImages.img2,
+        this.projectImages.img3,
+      ],
+    })
+    this.webgl.updateSecondWebgl({
+      images: [
+        this.projectImages.websiteImage,
+        this.projectImages.img1,
+        this.projectImages.img2,
+        this.projectImages.img3,
+      ],
+    })
 
     window.addEventListener('resize', () => {
       this.webgl.updatePlaneCoverWindowSize()
+      this.webgl.updateWebgl2()
     })
   },
   async beforeDestroy() {
@@ -321,12 +356,6 @@ export default {
     await this.disappearProjectInformations()
     await this.disappearCanvas()
   },
-  // updated() {
-  //   if (this.websiteImage.el) {
-  //     this.webgl?.createProjectsPlanes({ images: [this.websiteImage.el] })
-  //     // console.log(this.webgl)
-  //   }
-  // },
   methods: {
     ...mapMutations(['DISABLE_ACTIVE_TITLE']),
     resizePlane() {

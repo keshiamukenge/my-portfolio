@@ -53,14 +53,10 @@ html {
   }
 
   canvas.second-webgl {
-    height: 100%;
-    z-index: 1;
-    width: 100%;
-    position: absolute;
+    position: fixed;
     top: 0;
-    bottom: 0;
-    right: 0;
     left: 0;
+    z-index: 1;
   }
 
   span.c-scrollbar_thumb {
@@ -68,5 +64,10 @@ html {
     opacity: 1;
     width: 3px;
     border-radius: 0px;
+  }
+
+  main {
+    position: relative;
+    z-index: 2;
   }
 }

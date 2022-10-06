@@ -14,21 +14,9 @@ export default {
       required: true,
     },
   },
-  // watch: {
-  //   images() {
-  //     if (this.$props.images[0] !== null) {
-  //       this.webgl?.createProjectsPlanes({ images: [this.$props.images] })
-  //     }
-  //   },
-  // },
   mounted() {
     this.webgl = useWebGL()
     this.webgl.initSecondWebgl()
-    this.webgl.updateSecondWebgl()
-
-    // if (this.$props.images[0] !== null) {
-    //   this.webgl.updateSecondWebgl()
-    // }
   },
 }
 </script>

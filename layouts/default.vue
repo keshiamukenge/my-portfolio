@@ -6,6 +6,7 @@
     </main>
     <Footer />
     <canvas class="main-webgl"></canvas>
+    <canvas class="second-webgl"></canvas>
   </div>
 </template>
 
