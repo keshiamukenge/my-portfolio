@@ -38,9 +38,23 @@
         "height": 1024
       },
       "website": {
-        "image": {
-          "url": "images/camille-gubian-portfolio-website.png"
-        },
+        "images": [
+          {
+            "id": 0,
+            "url": "images/cam-portfolio-project/website1.png",
+            "ref": "website1"
+          },
+          {
+            "id": 1,
+            "url": "images/cam-portfolio-project/website2.png",
+            "ref": "website2"
+          },
+          {
+            "id": 2,
+            "url": "images/cam-portfolio-project/website3.png",
+            "ref": "website3"
+          }
+        ],
         "url": "https://camillegubian.fr/"
       },
       "role": [
@@ -86,9 +100,23 @@
         "height": 4000
       },
       "website": {
-        "image": {
-          "url": "images/out-of-school-website.png"
-        },
+        "images": [
+          {
+            "id": 0,
+            "url": "images/sff-project/website1.png",
+            "ref": "website1"
+          },
+          {
+            "id": 1,
+            "url": "images/sff-project/website2.png",
+            "ref": "website2"
+          },
+          {
+            "id": 2,
+            "url": "images/sff-project/website3.png",
+            "ref": "website3"
+          }
+        ],
         "url": "https://out-of-school.vercel.app/"
       },
       "role": [
@@ -134,13 +162,32 @@
       "image": {
         "url": "images/out-of-school-project.jpeg",
         "class": "img2",
-        "width": 6288,
-        "height": 3536
+        "width": 2731,
+        "height": 4096
       },
       "website": {
-        "image": {
-          "url": "images/out-of-school-website.png"
-        },
+        "images": [
+          {
+            "id": 0,
+            "url": "images/out-of-school-project/website1.png",
+            "ref": "website1"
+          },
+          {
+            "id": 1,
+            "url": "images/out-of-school-project/website2.png",
+            "ref": "website2"
+          },
+          {
+            "id": 2,
+            "url": "images/out-of-school-project/website3.png",
+            "ref": "website3"
+          },
+          {
+            "id": 3,
+            "url": "images/out-of-school-project/website4.png",
+            "ref": "website4"
+          }
+        ],
         "url": "https://out-of-school.vercel.app/"
       },
       "role": [

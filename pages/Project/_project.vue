@@ -175,27 +175,11 @@
               </Informations>
             </ContainerProjectInformations>
           </ContainerProjectDescription>
-          <ContainerImageWebsite>
-            <ImageElement
-              ref="websiteImage"
-              :src="selectedProject.website.image.url"
-              data-scroll
-            />
-            <ImageElement
-              ref="img1"
-              src="images/cam-portfolio-project.jpeg"
-              data-scroll
-            />
-            <ImageElement
-              ref="img2"
-              src="images/sff-project.jpeg"
-              data-scroll
-            />
-            <ImageElement
-              ref="img3"
-              src="images/out-of-school-project.jpeg"
-              data-scroll
-            />
+          <ContainerImageWebsite
+            v-for="image in selectedProject.website.images"
+            :key="image.id"
+          >
+            <ImageElement :ref="image.ref" :src="image.url" data-scroll />
           </ContainerImageWebsite>
         </ContainerProjectInformationsContent>
       </ContainerProjectInformationsSection>
@@ -283,6 +267,7 @@ export default {
         height: 0,
         aspect: 0,
       },
+      imagesWebsite: [],
     }
   },
   computed: {
@@ -309,10 +294,7 @@ export default {
 
     this.pageContainer = this.$refs.pageContainer.$el
     this.appearProjectInformations()
-    this.projectImages.websiteImage = this.$refs.websiteImage.$el
-    this.projectImages.img1 = this.$refs.img1.$el
-    this.projectImages.img2 = this.$refs.img2.$el
-    this.projectImages.img3 = this.$refs.img3.$el
+    this.addImageToWebgl()
 
     // First webgl scene
     this.webgl = useWebGL()
@@ -325,20 +307,10 @@ export default {
     // Second webgl scene
     this.webgl.initSecondWebgl()
     this.webgl.createProjectsPlanes({
-      images: [
-        this.projectImages.websiteImage,
-        this.projectImages.img1,
-        this.projectImages.img2,
-        this.projectImages.img3,
-      ],
+      images: this.imagesWebsite,
     })
     this.webgl.updateSecondWebgl({
-      images: [
-        this.projectImages.websiteImage,
-        this.projectImages.img1,
-        this.projectImages.img2,
-        this.projectImages.img3,
-      ],
+      images: this.imagesWebsite,
     })
 
     window.addEventListener('resize', () => {
@@ -388,6 +360,16 @@ export default {
         opacity: 0,
         duration: 0.3,
       })
+    },
+    addImageToWebgl() {
+      const refs = []
+      this.selectedProject.website.images.forEach((project) => {
+        refs.push(project.ref)
+      })
+      refs.forEach((ref) => {
+        this.imagesWebsite.push(this.$refs[ref][0].$el)
+      })
+      console.log(this.imagesWebsite)
     },
   },
 }

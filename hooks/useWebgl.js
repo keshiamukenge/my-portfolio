@@ -427,15 +427,15 @@ class WebGL {
 		const aspect = 1.25
 		if (viewportOptions.aspect < aspect) {
 			gsap.to(this.plane.scale, {
-				x: aspect / viewportOptions.aspect / 2.8,
-				y: 1 / 2.3,
+				x: aspect / viewportOptions.aspect,
+				y: 1,
 				duration: 1.7,
 				ease: Power2.easeInOut,
 			})
 		} else {
 			gsap.to(this.plane.scale, {
-				x: 1 / 2.8,
-				y: viewportOptions.aspect / aspect / 2.3,
+				x: 1,
+				y: viewportOptions.aspect / aspect,
 				duration: 1.7,
 				ease: Power2.easeInOut,
 			})
