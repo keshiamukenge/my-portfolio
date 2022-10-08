@@ -329,8 +329,8 @@ export default {
     this.addImageToWebgl()
 
     this.webgl = useWebGL()
-    this.webgl.initSecondWebgl()
     this.webgl.sizes = this.viewport
+    this.webgl.initSecondWebgl()
     this.webgl.createProjectsPlanes({
       images: this.imagesWebsite,
     })

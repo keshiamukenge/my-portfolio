@@ -207,10 +207,14 @@ class WebGL {
 	initSecondWebgl() {
 		this.scene2 = new THREE.Scene()
 
-		const perspective = 1000
-		const fov = (180 * (2 * Math.atan(window.innerHeight / 2 / perspective))) / Math.PI
-		this.camera2 = new THREE.PerspectiveCamera(fov, this.sizes.aspect, 1, 1000)
-		this.camera2.position.set(0, 0, perspective)
+		this.camera2 = new THREE.OrthographicCamera(
+			this.sizes.width / -2,
+			this.sizes.width / 2,
+			this.sizes.height / 2,
+			this.sizes.height / -2,
+			-1000,
+			1000
+		)
 
 		this.renderer2 = new THREE.WebGL1Renderer({
 			antialias: true,
