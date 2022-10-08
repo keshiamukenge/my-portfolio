@@ -12,10 +12,10 @@
 
 <script>
 import { mapMutations, mapGetters } from 'vuex'
-import gsap from 'gsap'
+import { gsap } from 'gsap'
 
 import { Header, Footer } from '../components/Essentials'
-import useWebGL from '@/hooks/useWebGL'
+import useWebGL from '../hooks/useWebGL'
 
 export default {
   components: {

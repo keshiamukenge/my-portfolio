@@ -159,7 +159,7 @@
                 </intersect>
               </Informations>
             </ContainerProjectInformations>
-            <ContainerProjectInformations gridColumn="1/4">
+            <ContainerProjectInformations grid-column="1/4">
               <Subtitle>
                 <intersect
                   :threshold="[0.9]"
@@ -208,13 +208,13 @@
 </template>
 
 <script>
-import gsap, { Power2 } from 'gsap'
+import { gsap, Power2 } from 'gsap'
 import { mapGetters, mapMutations } from 'vuex'
 import Intersect from 'vue-intersect'
-import Title from '../../shared/vue-lib/src/stories/components/Title/Title.vue'
-import Paragraph from '../../shared/vue-lib/src/stories/components/Paragraph/Paragraph.vue'
+import { Title, Paragraph } from '../../components/TextAnimations'
 
 import { colors, fonts } from '../../theme'
+import useWebGL from '../../hooks/useWebGL'
 import {
   PageContainer,
   MainContainer,
@@ -231,8 +231,7 @@ import {
   ImageIntroWebsite,
   ContainerImageIntroWebsite,
 } from './styledComponents'
-import smoothScroll from '@/mixins/smoothScroll'
-import useWebGL from '@/hooks/useWebGL'
+import smoothScroll from '~/mixins/smoothScroll'
 
 export default {
   name: 'Project',

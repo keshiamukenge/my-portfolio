@@ -101,10 +101,8 @@
 </template>
 
 <script>
-import gsap, { Power2 } from 'gsap'
-import { mapMutations } from 'vuex'
-import Title from '../shared/vue-lib/src/stories/components/Title/Title.vue'
-import Paragraph from '../shared/vue-lib/src/stories/components/Paragraph/Paragraph.vue'
+import { gsap, Power2 } from 'gsap'
+import { Title, Paragraph } from '../components/TextAnimations'
 
 import { fonts, colors } from '../theme'
 import {
@@ -117,7 +115,7 @@ import {
   AboutSpan,
   AboutSubtitle,
 } from './styledComponents'
-import smoothScroll from '@/mixins/smoothScroll'
+import smoothScroll from '~/mixins/smoothScroll'
 
 export default {
   name: 'About',
@@ -161,11 +159,9 @@ export default {
     }
   },
   mounted() {
-    this.SET_BODY_OVERFLOW()
     this.revealText()
   },
   methods: {
-    ...mapMutations(['SET_BODY_OVERFLOW']),
     revealText() {
       setTimeout(() => {
         this.reveal.title = true

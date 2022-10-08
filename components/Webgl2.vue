@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import useWebGL from '@/hooks/useWebGL'
+import useWebGL from '../hooks/useWebGL'
 
 export default {
   name: 'Webgl2',

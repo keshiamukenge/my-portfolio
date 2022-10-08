@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import gsap, { Power2 } from 'gsap'
+import { gsap, Power2 } from 'gsap'
 
 import {
   MainContainer,

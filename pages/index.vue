@@ -56,12 +56,13 @@
 </template>
 
 <script>
-import gsap from 'gsap'
+import { gsap } from 'gsap'
 import { mapMutations, mapGetters } from 'vuex'
-import Title from '../shared/vue-lib/src/stories/components/Title/Title.vue'
+import { Title } from '../components/TextAnimations'
 
 import { fonts, colors } from '../theme'
 import Loader from '../components/Loader'
+import useWebGL from '../hooks/useWebGL'
 import {
   ContainerProjects,
   ContainerProject,
@@ -71,8 +72,7 @@ import {
   Pagination,
   PaginationDivided,
 } from './styledComponents'
-import smoothScroll from '@/mixins/smoothScroll'
-import useWebGL from '@/hooks/useWebGL'
+import smoothScroll from '~/mixins/smoothScroll'
 
 export default {
   name: 'Home',

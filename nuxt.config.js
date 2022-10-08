@@ -17,6 +17,10 @@ export default {
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
 
+  generate: {
+    dir: 'dist'
+  },
+
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     '~/assets/scss/reset.scss',
@@ -50,5 +54,24 @@ export default {
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    babel: {
+      plugins: [
+        '@babel/plugin-proposal-object-rest-spread',
+        '@babel/plugin-proposal-private-property-in-object',
+        '@babel/plugin-proposal-class-properties',
+        '@babel/plugin-proposal-private-methods'
+      ],
+    },
+    presets({ isServer }) {
+      return [
+        [
+          '@babel/preset-env',
+          {
+            targets: '> 2%, not dead'
+          }
+        ]
+      ]
+    }
+  }
 }

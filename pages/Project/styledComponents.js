@@ -15,12 +15,12 @@ export const PageContainer = styled.div`
 `
 
 export const MainContainer = styled.div`
-	width: 100vw;
-	height: auto;
-	display: flex;
-	flex-direction: column;
-	z-index: 0;
-	position: relative;
+  width: 100vw;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  z-index: 0;
+  position: relative;
 `
 
 export const Background = styled.div`
@@ -52,7 +52,6 @@ export const ContainerImage = styled.div`
   height: auto;
 `
 
-
 export const ImageElement = styled.img`
   width: 100%;
   height: 500px;
@@ -81,7 +80,10 @@ export const ContainerProjectInformationsSection = styled.div`
   padding: 4rem 20rem;
 `
 
-export const ContainerProjectInformations = styled('div', containerProjectInformationsProps)`
+export const ContainerProjectInformations = styled(
+  'div',
+  containerProjectInformationsProps
+)`
   width: 100%;
   height: fit-content;
   margin-bottom: 2rem;
