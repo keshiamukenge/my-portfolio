@@ -1,13 +1,16 @@
 import styled from 'vue-styled-components'
 
-import { colors, fonts } from '../../theme'
+import { colors } from '../../theme'
+
+const containerProjectInformationsProps = {
+  gridColumn: String,
+}
 
 export const PageContainer = styled.div`
   width: 100%;
   min-width: 100vw;
   min-height: 100vh;
   height: fit-content;
-  padding-top: 72vh;
   opacity: 0;
 `
 
@@ -32,10 +35,23 @@ export const Background = styled.div`
   right: 0;
 `
 
+export const ContainerImageIntroWebsite = styled.div`
+  width: 100vw;
+  height: 100vh;
+  opacity: 0;
+`
+
+export const ImageIntroWebsite = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`
+
 export const ContainerImage = styled.div`
   width: 100%;
   height: auto;
 `
+
 
 export const ImageElement = styled.img`
   width: 100%;
@@ -51,7 +67,6 @@ export const ContainerImageWebsite = styled.div`
   justify-content: center;
   align-items: center;
   margin: 3rem 2rem 0 0;
-  padding: 0 4rem;
 `
 
 export const ContainerProjectInformationsContent = styled.div`
@@ -63,14 +78,14 @@ export const ContainerProjectInformationsContent = styled.div`
 export const ContainerProjectInformationsSection = styled.div`
   width: 100%;
   height: auto;
-  padding: 4rem 15rem;
+  padding: 4rem 20rem;
 `
 
-export const ContainerProjectInformations = styled.div`
-  width: 80%;
+export const ContainerProjectInformations = styled('div', containerProjectInformationsProps)`
+  width: 100%;
   height: fit-content;
-  margin-bottom: 3rem;
-  padding: 0 4rem;
+  margin-bottom: 2rem;
+  grid-column: ${(props) => props.gridColumn};
 `
 
 export const ProjectTitle = styled.h2`
@@ -79,8 +94,10 @@ export const ProjectTitle = styled.h2`
 `
 
 export const ContainerProjectDescription = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 20% 20% 20% 40%;
+  grid-template-rows: auto;
+  grid-gap: 2rem;
   width: 100%;
   height: fit-content;
 
@@ -100,31 +117,8 @@ export const Subtitle = styled.h3`
   }
 `
 
-export const SpanElement = styled.span`
-  display: block;
-  font-family: ${fonts.bodyFont};
-  text-transform: uppercase;
-  font-size: 0.8rem;
-  color: ${colors.white};
-  margin-bottom: 0.3rem;
-
-  div {
-    padding: 0 !important;
-
-    div {
-      padding: 0 !important;
-    }
-  }
-`
-
 export const Informations = styled.p`
   width: 100%;
-`
-
-export const ContainerSpanElement = styled.div`
-  width: fit-content;
-  height: fit-content;
-  padding-top: 1rem;
 `
 
 export const ContainerProjectInformationsIntroduction = styled.div`

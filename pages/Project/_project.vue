@@ -1,6 +1,9 @@
 <template>
   <PageContainer ref="pageContainer" data-scroll>
     <MainContainer class="container-project-information">
+      <ContainerImageIntroWebsite>
+        <ImageIntroWebsite ref="imageIntro" :src="selectedProject.image.url" />
+      </ContainerImageIntroWebsite>
       <ContainerProjectInformationsSection>
         <ContainerProjectInformationsIntroduction>
           <ProjectTitle>
@@ -18,24 +21,6 @@
               />
             </intersect>
           </ProjectTitle>
-          <ContainerSpanElement
-            v-for="role in selectedProject.role"
-            :key="role.id"
-          >
-            <SpanElement>
-              <Title
-                :text="role.label"
-                title-class="first-role"
-                :reveal="revealTitle"
-                :font-color="textColor"
-                font-size="0.8rem"
-                split-characters="words"
-                :font="bodyFont"
-                :duration="0.5"
-                :animation="3"
-              />
-            </SpanElement>
-          </ContainerSpanElement>
         </ContainerProjectInformationsIntroduction>
         <ContainerProjectInformationsContent>
           <ContainerProjectDescription>
@@ -81,7 +66,7 @@
                   @enter.once="revealProjectPart.secondSection = true"
                 >
                   <Title
-                    :text="selectedProject.parts.client.title"
+                    :text="selectedProject.parts.role.title"
                     title-class="second-subtitle"
                     :reveal="revealProjectPart.secondSection"
                     :font-color="textColor"
@@ -94,24 +79,29 @@
                 </intersect>
               </Subtitle>
               <Informations>
-                <Paragraph
-                  :text="selectedProject.parts.client.content"
-                  paragraph-class="second-content"
-                  :reveal="revealProjectPart.secondSection"
-                  :font="bodyFont"
-                  :duration="1"
-                  delay="<10%"
-                />
+                <intersect
+                  :threshold="[0.9]"
+                  @enter.once="revealProjectPart.secondSection = true"
+                >
+                  <Paragraph
+                    :text="selectedProject.parts.role.content"
+                    paragraph-class="second-content"
+                    :reveal="revealProjectPart.secondSection"
+                    :font="bodyFont"
+                    :duration="1"
+                    delay="<10%"
+                  />
+                </intersect>
               </Informations>
             </ContainerProjectInformations>
             <ContainerProjectInformations>
               <Subtitle>
                 <intersect
                   :threshold="[0.9]"
-                  @enter="revealProjectPart.thirdSection = true"
+                  @enter.once="revealProjectPart.thirdSection = true"
                 >
                   <Title
-                    :text="selectedProject.parts.technologies.label"
+                    :text="selectedProject.parts.client.title"
                     title-class="third-subtitle"
                     :reveal="revealProjectPart.thirdSection"
                     :font-color="textColor"
@@ -124,29 +114,24 @@
                 </intersect>
               </Subtitle>
               <Informations>
-                <intersect
-                  :threshold="[0.9]"
-                  @enter.once="revealProjectPart.thirdSection = true"
-                >
-                  <Paragraph
-                    :text="selectedProject.parts.technologies.content"
-                    paragraph-class="third-content"
-                    :reveal="revealProjectPart.thirdSection"
-                    :font="bodyFont"
-                    :duration="1"
-                    delay="<10%"
-                  />
-                </intersect>
+                <Paragraph
+                  :text="selectedProject.parts.client.content"
+                  paragraph-class="third-content"
+                  :reveal="revealProjectPart.thirdSection"
+                  :font="bodyFont"
+                  :duration="1"
+                  delay="<10%"
+                />
               </Informations>
             </ContainerProjectInformations>
             <ContainerProjectInformations>
               <Subtitle>
                 <intersect
                   :threshold="[0.9]"
-                  @enter.once="revealProjectPart.fourthSection = true"
+                  @enter="revealProjectPart.fourthSection = true"
                 >
                   <Title
-                    :text="selectedProject.parts.description.title"
+                    :text="selectedProject.parts.technologies.label"
                     title-class="fourth-subtitle"
                     :reveal="revealProjectPart.fourthSection"
                     :font-color="textColor"
@@ -164,9 +149,44 @@
                   @enter.once="revealProjectPart.fourthSection = true"
                 >
                   <Paragraph
-                    :text="selectedProject.parts.description.content"
-                    paragraph-class="fourth-section"
+                    :text="selectedProject.parts.technologies.content"
+                    paragraph-class="fourth-content"
                     :reveal="revealProjectPart.fourthSection"
+                    :font="bodyFont"
+                    :duration="1"
+                    delay="<10%"
+                  />
+                </intersect>
+              </Informations>
+            </ContainerProjectInformations>
+            <ContainerProjectInformations gridColumn="1/4">
+              <Subtitle>
+                <intersect
+                  :threshold="[0.9]"
+                  @enter.once="revealProjectPart.fiveSection = true"
+                >
+                  <Title
+                    :text="selectedProject.parts.description.title"
+                    title-class="five-subtitle"
+                    :reveal="revealProjectPart.fiveSection"
+                    :font-color="textColor"
+                    font-size="0.8rem"
+                    split-characters="words"
+                    :font="bodyFont"
+                    :duration="0.5"
+                    :animation="3"
+                  />
+                </intersect>
+              </Subtitle>
+              <Informations>
+                <intersect
+                  :threshold="[0.9]"
+                  @enter.once="revealProjectPart.fiveSection = true"
+                >
+                  <Paragraph
+                    :text="selectedProject.parts.description.content"
+                    paragraph-class="five-section"
+                    :reveal="revealProjectPart.fiveSection"
                     :font="bodyFont"
                     :duration="1"
                     delay="<10%"
@@ -188,7 +208,7 @@
 </template>
 
 <script>
-import gsap from 'gsap'
+import gsap, { Power2 } from 'gsap'
 import { mapGetters, mapMutations } from 'vuex'
 import Intersect from 'vue-intersect'
 import Title from '../../shared/vue-lib/src/stories/components/Title/Title.vue'
@@ -204,12 +224,12 @@ import {
   ContainerProjectDescription,
   Informations,
   ContainerProjectInformations,
-  SpanElement,
-  ContainerSpanElement,
   ContainerProjectInformationsIntroduction,
   ContainerProjectInformationsContent,
   ContainerImageWebsite,
   ImageElement,
+  ImageIntroWebsite,
+  ContainerImageIntroWebsite,
 } from './styledComponents'
 import smoothScroll from '@/mixins/smoothScroll'
 import useWebGL from '@/hooks/useWebGL'
@@ -230,17 +250,25 @@ export default {
     Title,
     Intersect,
     Paragraph,
-    SpanElement,
-    ContainerSpanElement,
     ContainerProjectInformationsIntroduction,
     ContainerProjectInformationsContent,
+    ImageIntroWebsite,
+    ContainerImageIntroWebsite,
   },
   mixins: [smoothScroll],
   transition: {
     leave(el, done) {
-      setTimeout(() => {
-        done()
-      }, 500)
+      const canvas = document.querySelector('canvas.second-webgl')
+      gsap.to(canvas, {
+        opacity: 0,
+        duration: 0.5,
+      })
+      gsap.to(el, {
+        opacity: 0,
+        duration: 0.5,
+        ease: Power2.easeInOut,
+        onComplete: done,
+      })
     },
   },
   data() {
@@ -254,6 +282,7 @@ export default {
         secondSection: false,
         thirdSection: false,
         fourthSection: false,
+        fiveSection: false,
       },
       pageContainer: null,
       projectImages: {
@@ -282,7 +311,9 @@ export default {
   },
   watch: {
     selectedProject() {
-      this.imagesOptions = this.selectedProject.image
+      this.webgl.imagesOptions = this.selectedProject.image
+      this.webgl.imagesOptions.aspect =
+        this.selectedProject.image.width / this.selectedProject.image.height
     },
   },
   async mounted() {
@@ -293,52 +324,39 @@ export default {
     }
 
     this.pageContainer = this.$refs.pageContainer.$el
+    this.appearCanvas()
     this.appearProjectInformations()
     this.addImageToWebgl()
 
-    // First webgl scene
     this.webgl = useWebGL()
-    this.webgl.imagesOptions.width = this.selectedProject.image.width
-    this.webgl.imagesOptions.height = this.selectedProject.image.height
-    this.webgl.imagesOptions.aspect =
-      this.selectedProject.image.width / this.selectedProject.image.height
-    this.webgl.sizes = this.viewport
-
-    // Second webgl scene
     this.webgl.initSecondWebgl()
+    this.webgl.sizes = this.viewport
     this.webgl.createProjectsPlanes({
       images: this.imagesWebsite,
     })
     this.webgl.updateSecondWebgl({
       images: this.imagesWebsite,
     })
-
-    window.addEventListener('resize', () => {
-      this.webgl.updatePlaneCoverWindowSize()
-      this.webgl.updateWebgl2()
-    })
   },
   async beforeDestroy() {
-    if (this.$route.name === 'index') {
-      this.webgl.scaleDownPlaneCenteredPosition({
-        viewportOptions: this.viewport,
-      })
-    }
-    this.DISABLE_ACTIVE_TITLE()
-    await this.disappearProjectInformations()
-    await this.disappearCanvas()
+    await this.DISABLE_ACTIVE_TITLE()
+    await this.webgl.updatePlaneCenteredPosition()
   },
   methods: {
     ...mapMutations(['DISABLE_ACTIVE_TITLE']),
-    resizePlane() {
-      const { setPlaneCenteredPosition } = useWebGL()
-      setPlaneCenteredPosition()
-    },
     // INTERACTIONS
     disappearProjectInformations() {
       gsap.to(this.pageContainer, {
-        duration: 0.3,
+        duration: 0.5,
         opacity: 0,
+      })
+    },
+    slideUpProjectInformations() {
+      gsap.to('.main', {
+        y: -100 + 'vh',
+        duration: 0.5,
+        ease: 'power2.out',
+        opacity: 1,
       })
     },
     appearProjectInformations() {
@@ -347,18 +365,18 @@ export default {
         opacity: 1,
       })
     },
-    appearImage() {
-      gsap.to(this.websiteImage.el, {
-        opacity: 0,
-        duration: 0.3,
+    appearCanvas() {
+      const canvas = document.querySelector('canvas.second-webgl')
+      gsap.to(canvas, {
+        opacity: 1,
+        duration: 0.5,
       })
     },
     disappearCanvas() {
-      if (this.$route.name !== 'About') return
-      const canvas = document.querySelector('canvas')
+      const canvas = document.querySelector('canvas.second-webgl')
       gsap.to(canvas, {
         opacity: 0,
-        duration: 0.3,
+        duration: 0.5,
       })
     },
     addImageToWebgl() {
@@ -369,7 +387,7 @@ export default {
       refs.forEach((ref) => {
         this.imagesWebsite.push(this.$refs[ref][0].$el)
       })
-      console.log(this.imagesWebsite)
+      this.imagesWebsite.push(this.$refs.imageIntro.$el)
     },
   },
 }

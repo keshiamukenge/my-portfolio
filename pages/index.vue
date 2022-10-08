@@ -25,7 +25,7 @@
               split-characters="letters"
               :font="titleFont"
               :font-color="titleColor"
-              font-size="4rem"
+              font-size="5rem"
               :duration="0.5"
               :animation="3"
               :timeline-delay-on-reveal="1"
@@ -134,6 +134,10 @@ export default {
   },
   watch: {
     // eslint-disable-next-line object-shorthand
+    selectedProject: function () {
+      this.webgl.scaleUpPlaneCoverWindowSize()
+    },
+    // eslint-disable-next-line object-shorthand
     activeProject: function () {
       this.textures = {
         default: this.projects[0].image.url,
@@ -143,48 +147,38 @@ export default {
       }
       this.webgl.startWebglTransition({ textures: this.textures })
     },
-    // eslint-disable-next-line object-shorthand
-    selectedProject: function () {
-      this.webgl.scaleUpPlaneCoverWindowSize()
-    },
   },
   async mounted() {
     try {
       await this.$store.dispatch('fetchProjectsData')
-
       await this.setImageOptions({ image: this.projects[0].image })
-
       this.textures.default = this.textures.active = this.projects[0].image.url
       this.textures.next = this.projects[1].image.url
     } catch (e) {
       console.log(e)
     }
 
-    const canvas = document.querySelector('canvas')
-    gsap.to(canvas, {
-      opacity: 1,
-      duration: 0.5,
-    })
-
+    this.appearCanvas()
     this.ENABLE_ACTIVE_TITLE()
 
     this.webgl = useWebGL()
+    this.webgl.initFirstWebgl()
+    this.webgl.updatePlaneCenteredPosition()
+    this.webgl.updateFirstWebgl()
     this.webgl.textures = this.textures
     this.webgl.imagesOptions = this.imagesOptions
-    this.webgl.sizes = this.viewport
-    this.webgl.updatePlaneCenteredPosition()
+    // this.webgl.sizes = this.viewport
 
     window.addEventListener('wheel', this.onWheel)
-
-    window.addEventListener('resize', () => {
-      if (this.$route.name === 'index') {
-        this.webgl.updatePlaneCenteredPosition()
-      }
-    })
   },
   async beforeDestroy() {
-    await this.disappearCanvas()
     await window.removeEventListener('wheel', this.onWheel)
+  },
+  destroyed() {
+    this.webgl.destroy({
+      renderer: this.webgl.renderer,
+      scene: this.webgl.scene,
+    })
   },
   methods: {
     ...mapMutations([
@@ -215,12 +209,10 @@ export default {
         aspect: image.width / image.height,
       }
     },
-    disappearCanvas() {
-      if (this.$route.name !== 'About') return
-
-      const canvas = document.querySelector('canvas')
+    appearCanvas() {
+      const canvas = document.querySelector('canvas.main-webgl')
       gsap.to(canvas, {
-        opacity: 0,
+        opacity: 1,
         duration: 0.5,
       })
     },

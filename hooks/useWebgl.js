@@ -46,8 +46,6 @@ class WebGL {
 			ease: 0.075
 		}
 
-		// this.gui = new dat.GUI()
-
 		this.setMousePosition({ waterEffectOptions: this.waterEffectOptions })
 	}
 
@@ -207,15 +205,6 @@ class WebGL {
 	}
 
 	initSecondWebgl() {
-		this.canvas2 = document.querySelector('canvas.second-webgl')
-		this.container = document.querySelector('.container-project-information')
-		this.sizes2 = {
-			width: this.container.getBoundingClientRect().width,
-			height: this.container.getBoundingClientRect().height,
-			top: this.container.getBoundingClientRect().top,
-			left: this.container.getBoundingClientRect().left,
-			aspect: this.container.getBoundingClientRect().width / this.container.getBoundingClientRect().height,
-		}
 		this.scene2 = new THREE.Scene()
 
 		const perspective = 1000
@@ -223,7 +212,11 @@ class WebGL {
 		this.camera2 = new THREE.PerspectiveCamera(fov, this.sizes.aspect, 1, 1000)
 		this.camera2.position.set(0, 0, perspective)
 
-		this.renderer2 = new THREE.WebGL1Renderer({ antialias: true, alpha: true, canvas: this.canvas2 })
+		this.renderer2 = new THREE.WebGL1Renderer({
+			antialias: true,
+			alpha: true,
+			canvas: document.querySelector('canvas.second-webgl')
+		})
 		this.renderer2.setSize(this.sizes.width, this.sizes.height)
 		this.renderer2.setPixelRatio(window.devicePixelRatio)
 		this.composer = new EffectComposer(this.renderer2)
@@ -335,24 +328,21 @@ class WebGL {
 		})
 	}
 
-	updateFirstWebgl() {
-		requestAnimationFrame(() => this.updateFirstWebgl())
+	updateComposerEffect() {
+		requestAnimationFrame(() => this.updateComposerEffect())
+
 		updatePoints({
 			maxAge: this.waterEffectOptions.maxAge,
 			radius: this.waterEffectOptions.radius,
 		})
-		this.material.uniformsNeedUpdate = true
-		this.composer.render(this.clock.getDelta())
 	}
 
-	updateScrollOptions({ target, lerp }) {
-		this.scrollOptions.target = target
-		this.scrollOptions.ease = lerp
-    this.scrollOptions.current = this.lerp(
-			this.scrollOptions.current,
-			this.scrollOptions.target,
-			this.scrollOptions.ease
-		)
+	updateFirstWebgl() {
+		requestAnimationFrame(() => this.updateFirstWebgl())
+
+		this.camera.updateProjectionMatrix()
+		this.composer.setSize(this.sizes.width, this.sizes.height)
+		this.composer.render(this.clock.getDelta())
 	}
 
 	updateSecondWebgl({ images }) {
@@ -361,11 +351,12 @@ class WebGL {
 		this.imagesParameters.forEach(image => {
 			this.setProjectsPlanesDimensions({ image: image.domEl })
 			image.plane.position.set(this.offset.x, this.offset.y, 0)
-			image.plane.scale.set(this.projectPlaneSizes.x, this.projectPlaneSizes.y, 1)
-			// image.plane.material.uniforms.uOffset.value.x = this.offset.x * 0.0
-			// image.plane.material.uniforms.uOffset.value.y = -(this.scrollOptions.target - this.scrollOptions.current) * 0.0003
+		// image.plane.scale.set(this.projectPlaneSizes.x, this.projectPlaneSizes.y, 1)
 			image.plane.material.uniformsNeedUpdate = true
 		})
+		this.camera2.updateProjectionMatrix()
+		this.composer.setSize(this.sizes.width, this.sizes.height)
+		this.composer.render(this.clock.getDelta())
 	}
 
 	// SETUP POST PROCESSING
@@ -390,21 +381,6 @@ class WebGL {
 		this.composer.setSize(this.sizes.width, this.sizes.height)
 	}
 
-	updatePlaneCoverWindowSize() {
-		if (this.imagesOptions.aspect > this.sizes.aspect) {
-			this.plane.scale.x = this.imagesOptions.aspect / this.sizes.aspect
-			this.plane.scale.y = 1
-		} else {
-			this.plane.scale.x = 1
-			this.plane.scale.y = this.sizes.aspect / this.imagesOptions.aspect
-		}
-	}
-
-	updateWebgl2() {
-		this.camera2.updateProjectionMatrix()
-		this.composer.setSize(this.sizes.width, this.sizes.height)
-	}
-
 	scaleUpPlaneCoverWindowSize() {
 		if (this.imagesOptions.aspect > this.sizes.aspect) {
 			gsap.to(this.plane.scale, {
@@ -412,6 +388,11 @@ class WebGL {
 				y: 1,
 				duration: 1.7,
 				ease: Power2.easeInOut,
+				onComplete: () => {
+					this.renderer.domElement.style.opacity = 0
+					// this.updatePlaneCenteredPosition()
+					// this.destroy({ renderer: this.renderer, scene: this.scene })
+				}
 			})
 		} else {
 			gsap.to(this.plane.scale, {
@@ -419,23 +400,28 @@ class WebGL {
 				y: this.sizes.aspect / this.imagesOptions.aspect,
 				duration: 1.7,
 				ease: Power2.easeInOut,
+				onComplete: () => {
+					this.renderer.domElement.style.opacity = 0
+					// this.updatePlaneCenteredPosition()
+					// this.destroy({ renderer: this.renderer, scene: this.scene })
+				}
 			})
 		}
 	}
 
-	scaleDownPlaneCenteredPosition({ viewportOptions }) {
+	scaleDownPlaneCenteredPosition() {
 		const aspect = 1.25
-		if (viewportOptions.aspect < aspect) {
+		if (this.imagesOptions.aspect > aspect) {
 			gsap.to(this.plane.scale, {
-				x: aspect / viewportOptions.aspect,
-				y: 1,
+				x: aspect / this.imagesOptions.aspect / 2.8,
+				y: 1 / 2.3,
 				duration: 1.7,
 				ease: Power2.easeInOut,
 			})
 		} else {
 			gsap.to(this.plane.scale, {
-				x: 1,
-				y: viewportOptions.aspect / aspect,
+				x: 1 / 2.3,
+				y: this.imagesOptions.aspect / aspect / 2.8,
 				duration: 1.7,
 				ease: Power2.easeInOut,
 			})
@@ -457,6 +443,36 @@ class WebGL {
 				this.isRunning = false
 			},
 		})
+	}
+
+	// DESTROY
+	destroy({ renderer, scene }) {
+		renderer.dispose()
+
+		scene.traverse(object => {
+			if (!object.isMesh) return
+			
+			object.geometry.dispose()
+		
+			if (object.material.isMaterial) {
+				this.cleanMaterial(object.material)
+			} else {
+				// an array of materials
+				for (const material of object.material) this.cleanMaterial(material)
+			}
+		})
+	}
+
+	cleanMaterial = material => {
+		material.dispose()
+	
+		// dispose textures
+		for (const key of Object.keys(material)) {
+			const value = material[key]
+			if (value && typeof value === 'object' && 'minFilter' in value) {
+				value.dispose()
+			}
+		}
 	}
 }
 

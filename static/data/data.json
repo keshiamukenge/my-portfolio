@@ -57,13 +57,11 @@
         ],
         "url": "https://camillegubian.fr/"
       },
-      "role": [
-        {
-          "id": 0,
-          "label": "developmnent"
-        }
-      ],
       "parts": {
+        "role": {
+          "title": "role",
+          "content": "Developmnent"
+        },
         "date": {
           "title": "date",
           "content": "Juin 2022"
@@ -119,17 +117,11 @@
         ],
         "url": "https://out-of-school.vercel.app/"
       },
-      "role": [
-        {
-          "id": 0,
-          "label": "developmnent"
-        },
-        {
-          "id": 1,
-          "label": "design"
-        }
-      ],
       "parts": {
+        "role": {
+          "title": "role",
+          "content": "Design, Developmnent"
+        },
         "date": {
           "title": "date",
           "content": "Juillet 2022"
@@ -190,17 +182,11 @@
         ],
         "url": "https://out-of-school.vercel.app/"
       },
-      "role": [
-        {
-          "id": 0,
-          "label": "developmnent"
-        },
-        {
-          "id": 1,
-          "label": "design"
-        }
-      ],
       "parts": {
+        "role": {
+          "title": "role",
+          "content": "Design, Developmnent"
+        },
         "date": {
           "title": "date",
           "content": "April - Mai 2022"

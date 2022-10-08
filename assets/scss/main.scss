@@ -2,9 +2,11 @@
 @import './variables.scss';
 
 @font-face {
-  font-family: 'PS-Kaldera';
-  src: local('PS-Kaldera');
-  src: url(~assets/fonts/PS-Kaldera-Regular.otf) format('otf');
+  font-family: 'Satoshi';
+  src: local('Satoshi');
+  src: url(~assets/fonts/Satoshi/OTF/Satoshi-Medium.otf) format('otf');
+  src: url(~assets/fonts/Satoshi/OTF/Satoshi-Light.otf) format('otf');
+  src: url(~assets/fonts/Satoshi/OTF/Satoshi-Bold.otf) format('otf');
 }
 
 html {
@@ -23,12 +25,16 @@ html {
 
     h1 {
       font-family: $title-font;
+      font-weight: 500;
+      text-transform: uppercase;
     }
 
     h2 {
       font-family: $title-font;
       color: $white-color;
-      font-size: 4rem;
+      font-size: 8rem;
+      font-weight: 500;
+      text-transform: uppercase;
     }
 
     h3 {
@@ -36,12 +42,14 @@ html {
       font-size: 0.8rem;
       text-transform: uppercase;
       opacity: 0.5;
+      font-weight: 400;
     }
 
     p {
       font-family: $body-font;
       font-size: 1rem;
       line-height: 25px;
+      font-weight: 100;
     }
   }
   canvas.main-webgl {
