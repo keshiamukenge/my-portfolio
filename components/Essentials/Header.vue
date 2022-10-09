@@ -7,7 +7,9 @@
           : '/'
       "
     >
-      <HeaderLink>{{ $store.state?.headerData?.homepage?.label }}</HeaderLink>
+      <HeaderLink @click="beforeGoHome">{{
+        $store.state?.headerData?.homepage?.label
+      }}</HeaderLink>
     </NuxtLink>
     <NuxtLink
       :to="
@@ -16,7 +18,9 @@
           : '/'
       "
     >
-      <HeaderLink>{{ $store.state?.headerData?.about?.label }}</HeaderLink>
+      <HeaderLink @click="beforeGoAbout">{{
+        $store.state?.headerData?.about?.label
+      }}</HeaderLink>
     </NuxtLink>
   </ContainerHeader>
 </template>
@@ -27,8 +31,21 @@ import { ContainerHeader, HeaderLink } from './styledComponents'
 export default {
   name: 'Header',
   components: { ContainerHeader, HeaderLink },
+  props: {
+    beforeGoHome: {
+      type: Function,
+      required: false,
+      default: () => {},
+    },
+    beforeGoAbout: {
+      type: Function,
+      required: false,
+      default: () => {},
+    },
+  },
   async mounted() {
     await this.$store.dispatch('fetchHeaderData')
   },
+  methods: {},
 }
 </script>

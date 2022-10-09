@@ -1,6 +1,6 @@
 export const fonts = {
-	titleFont: 'PS-Kaldera',
-	bodyFont: 'Spinnaker'
+  titleFont: 'Satoshi',
+  bodyFont: 'Satoshi',
 }
 
 export default fonts
