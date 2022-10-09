@@ -91,8 +91,12 @@ export const ContainerProjectInformations = styled(
 `
 
 export const ProjectTitle = styled.h2`
-  width: fit-content;
+  width: 30%;
   height: fit-content;
+
+  div {
+    flex-wrap: wrap;
+  }
 `
 
 export const ContainerProjectDescription = styled.div`

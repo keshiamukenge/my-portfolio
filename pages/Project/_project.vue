@@ -1,9 +1,6 @@
 <template>
   <PageContainer ref="pageContainer" data-scroll>
     <MainContainer class="container-project-information">
-      <ContainerImageIntroWebsite>
-        <ImageIntroWebsite ref="imageIntro" :src="selectedProject.image.url" />
-      </ContainerImageIntroWebsite>
       <ContainerProjectInformationsSection>
         <ContainerProjectInformationsIntroduction>
           <ProjectTitle>
@@ -13,10 +10,10 @@
                 title-class="title-project"
                 :reveal="revealTitle"
                 :font-color="textColor"
-                font-size="4rem"
-                split-characters="letters"
+                font-size="6rem"
+                split-characters="words"
                 :font="titleFont"
-                :duration="0.5"
+                :duration="0.8"
                 :animation="1"
               />
             </intersect>
@@ -228,8 +225,6 @@ import {
   ContainerProjectInformationsContent,
   ContainerImageWebsite,
   ImageElement,
-  ImageIntroWebsite,
-  ContainerImageIntroWebsite,
 } from './styledComponents'
 import smoothScroll from '~/mixins/smoothScroll'
 
@@ -251,8 +246,6 @@ export default {
     Paragraph,
     ContainerProjectInformationsIntroduction,
     ContainerProjectInformationsContent,
-    ImageIntroWebsite,
-    ContainerImageIntroWebsite,
   },
   mixins: [smoothScroll],
   transition: {
@@ -284,12 +277,6 @@ export default {
         fiveSection: false,
       },
       pageContainer: null,
-      projectImages: {
-        websiteImage: null,
-        img1: null,
-        img2: null,
-        img3: null,
-      },
       imagesOptions: {
         width: 0,
         height: 0,
@@ -319,7 +306,7 @@ export default {
     try {
       await this.$store.dispatch('fetchProjectsData')
     } catch (e) {
-      console.log(e)
+      this.SET_ERROR('Error while fetching project data')
     }
 
     this.pageContainer = this.$refs.pageContainer.$el
@@ -328,36 +315,17 @@ export default {
     this.addImageToWebgl()
 
     this.webgl = useWebGL()
-    this.webgl.sizes = this.viewport
-    this.webgl.initSecondWebgl()
-    this.webgl.createProjectsPlanes({
-      images: this.imagesWebsite,
-    })
-    this.webgl.updateSecondWebgl({
-      images: this.imagesWebsite,
-    })
+    this.initWebgl2()
   },
-  async beforeDestroy() {
-    await this.DISABLE_ACTIVE_TITLE()
-    await this.webgl.updatePlaneCenteredPosition()
+  destroyed() {
+    this.webgl.destroy({
+      renderer: this.webgl.renderer2,
+      scene: this.webgl.scene2,
+    })
   },
   methods: {
-    ...mapMutations(['DISABLE_ACTIVE_TITLE']),
+    ...mapMutations(['DISABLE_ACTIVE_TITLE', 'SET_ERROR']),
     // INTERACTIONS
-    disappearProjectInformations() {
-      gsap.to(this.pageContainer, {
-        duration: 0.5,
-        opacity: 0,
-      })
-    },
-    slideUpProjectInformations() {
-      gsap.to('.main', {
-        y: -100 + 'vh',
-        duration: 0.5,
-        ease: 'power2.out',
-        opacity: 1,
-      })
-    },
     appearProjectInformations() {
       gsap.to(this.pageContainer, {
         duration: 0.3,
@@ -371,13 +339,6 @@ export default {
         duration: 0.5,
       })
     },
-    disappearCanvas() {
-      const canvas = document.querySelector('canvas.second-webgl')
-      gsap.to(canvas, {
-        opacity: 0,
-        duration: 0.5,
-      })
-    },
     addImageToWebgl() {
       const refs = []
       this.selectedProject.website.images.forEach((project) => {
@@ -386,7 +347,17 @@ export default {
       refs.forEach((ref) => {
         this.imagesWebsite.push(this.$refs[ref][0].$el)
       })
-      this.imagesWebsite.push(this.$refs.imageIntro.$el)
+    },
+    async initWebgl2() {
+      await this.addImageToWebgl()
+
+      this.webgl.initSecondWebgl()
+      this.webgl.createProjectsPlanes({
+        images: this.imagesWebsite,
+      })
+      this.webgl.updateSecondWebgl({
+        images: this.imagesWebsite,
+      })
     },
   },
 }
