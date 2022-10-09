@@ -17,35 +17,23 @@ export default {
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
 
+  generate: {
+    dir: 'dist',
+  },
+
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     '~/assets/scss/reset.scss',
     '~/assets/scss/variables.scss',
     '~/assets/scss/main.scss',
+    '~/assets/scss/scroll.scss',
   ],
 
-  // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  // loading: '~/components/Loader/Loader.vue',
+  loading: false,
 
-  router: {
-    routes: [
-      {
-        name: 'home',
-        path: '/',
-        component: 'pages/index.vue'
-      },
-      {
-        name: 'about',
-        path: '/about',
-        component: 'pages/index.vue'
-      },
-      {
-        type: 'project',
-        path: '/project/:uid',
-        component: 'pages/Project/_project.vue'
-      }
-    ]
-  },
+  // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
+  plugins: [{ src: '~/plugins/vuex-persist.js', mode: 'client' }],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -59,12 +47,31 @@ export default {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: ['@nuxtjs/axios',],
+  modules: ['@nuxtjs/axios'],
   axios: {
     proxy: true,
     mode: 'no-cors',
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    babel: {
+      plugins: [
+        '@babel/plugin-proposal-object-rest-spread',
+        '@babel/plugin-proposal-private-property-in-object',
+        '@babel/plugin-proposal-class-properties',
+        '@babel/plugin-proposal-private-methods',
+      ],
+    },
+    presets({ isServer }) {
+      return [
+        [
+          '@babel/preset-env',
+          {
+            targets: '> 2%, not dead',
+          },
+        ],
+      ]
+    },
+  },
 }

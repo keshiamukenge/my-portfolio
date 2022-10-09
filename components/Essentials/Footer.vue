@@ -1,5 +1,5 @@
 <template>
-  <ContainerFooter>
+  <ContainerFooter :bottom="bottom">
     <ContainerFooterLinks>
       <FooterLink
         target="_blank"
@@ -25,8 +25,14 @@ import {
   ContainerFooterLinks,
 } from './styledComponents'
 export default {
-  nmae: 'Footer',
+  name: 'Footer',
   components: { ContainerFooter, FooterLink, FooterText, ContainerFooterLinks },
+  props: {
+    bottom: {
+      type: String,
+      default: '0',
+    },
+  },
   async mounted() {
     await this.$store.dispatch('fetchFooterData')
   },

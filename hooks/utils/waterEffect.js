@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import { Effect } from "postprocessing";
+import * as THREE from 'three'
+import { Effect } from 'postprocessing'
 
 const fragment = `
 	uniform sampler2D uTexture;
@@ -12,16 +12,13 @@ const fragment = `
   	float intensity = tex.b;
     uv.x += vx * 0.2 * intensity;
     uv.y += vy * 0.2  *intensity;
-    // uv.xy *= 1. - 0.5 * smoothstep( 0., 1., intensity);
-    // uv.x +=  0.2 * intensity;
-    // uv.y +=  0.2  *intensity;
   }
-`;
+`
 
 export default function waterEffect({ texture }) {
-	const effect = new Effect();
-	effect.uniforms = new Map([["uTexture", new THREE.Uniform(texture)]])
-	effect.fragmentShader = fragment
+  const effect = new Effect()
+  effect.uniforms = new Map([['uTexture', new THREE.Uniform(texture)]])
+  effect.fragmentShader = fragment
 
-	return effect;
+  return effect
 }
