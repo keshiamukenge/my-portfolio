@@ -1,4 +1,5 @@
-const baseURL = 'http://localhost:3000/data/data.json'
+const baseURL = 'https://my-portfolio-eight-ecru.vercel.app/'
+// const baseURL = 'http://localhost:3000/data/data.json'
 
 export const state = {
   headerData: {},
