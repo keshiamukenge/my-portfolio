@@ -1,4 +1,4 @@
-const baseURL = 'https://my-portfolio-eight-ecru.vercel.app/'
+const baseURL = 'https://my-portfolio-eight-ecru.vercel.app/data/data.json'
 // const baseURL = 'http://localhost:3000/data/data.json'
 
 export const state = {
