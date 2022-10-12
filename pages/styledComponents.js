@@ -30,12 +30,16 @@ export const ImageElement = styled.img`
 `
 
 export const ProjectTitle = styled.h2`
-  width: fit-content;
+  width: 30%;
   text-align: center;
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 35%;
+  left: 25%;
   transform: translate(-50%, -50%);
+
+  div {
+    flex-wrap: wrap;
+  }
 `
 
 export const ProjectType = styled('span', projectTypeProps)`
@@ -59,18 +63,10 @@ export const ContainerPagination = styled.div`
   width: fit-content;
   height: fit-content;
   position: absolute;
-  top: 70%;
+  top: 78%;
   left: 75%;
   transform: translate(-50%, -50%);
   align-items: center;
-`
-
-export const PaginationDivided = styled.span`
-  display: block;
-  width: 2rem;
-  height: 0.5px;
-  background-color: ${colors.white};
-  margin: 0 1rem;
 `
 
 export const Pagination = styled.span`

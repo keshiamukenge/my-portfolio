@@ -10,23 +10,18 @@
           <ImageElement
             ref="images"
             :src="project.image.url"
-            @click="
-              () => {
-                SET_SELECTED_PROJECT({ id: activeProject?.id || 0 })
-                DISABLE_ACTIVE_TITLE()
-              }
-            "
+            @click="() => SET_SELECTED_PROJECT({ id: activeProject?.id || 0 })"
           />
           <ProjectTitle>
             <Title
               :text="project.title"
               :title-class="'project-title' + project.id"
               :reveal="project.value.revealTitle"
-              split-characters="letters"
+              split-characters="words"
               :font="titleFont"
               :font-color="titleColor"
-              font-size="5rem"
-              :duration="0.5"
+              font-size="6rem"
+              :duration="0.7"
               :animation="3"
               :timeline-delay-on-reveal="1"
             />
@@ -37,17 +32,15 @@
                 :text="`${project.id + 1}`"
                 :title-class="'pagination' + project.id"
                 :reveal="project.value.revealPagination"
-                split-characters="letters"
+                split-characters="words"
                 :font="bodyFont"
                 :font-color="titleColor"
-                font-size="1rem"
-                :duration="0.5"
-                :animation="2"
+                font-size="4rem"
+                :duration="1"
+                :animation="3"
                 :timeline-delay-on-reveal="1"
               />
             </Pagination>
-            <PaginationDivided />
-            <Pagination>{{ projects.length }}</Pagination>
           </ContainerPagination>
         </NuxtLink>
       </ContainerProject>
@@ -56,6 +49,7 @@
 </template>
 
 <script>
+// import * as THREE from 'three'
 import { gsap } from 'gsap'
 import { mapMutations, mapGetters } from 'vuex'
 import { Title } from '../components/TextAnimations'
@@ -70,7 +64,6 @@ import {
   ProjectTitle,
   ContainerPagination,
   Pagination,
-  PaginationDivided,
 } from './styledComponents'
 import smoothScroll from '~/mixins/smoothScroll'
 
@@ -84,7 +77,6 @@ export default {
     ProjectTitle,
     ContainerPagination,
     Pagination,
-    PaginationDivided,
     Loader,
   },
   mixins: [smoothScroll],
@@ -135,7 +127,7 @@ export default {
   watch: {
     // eslint-disable-next-line object-shorthand
     selectedProject: function () {
-      this.webgl.scaleUpPlaneCoverWindowSize()
+      this.DISABLE_ACTIVE_TITLE()
     },
     // eslint-disable-next-line object-shorthand
     activeProject: function () {
@@ -152,26 +144,31 @@ export default {
     try {
       await this.$store.dispatch('fetchProjectsData')
       await this.setImageOptions({ image: this.projects[0].image })
-      this.textures.default = this.textures.active = this.projects[0].image.url
-      this.textures.next = this.projects[1].image.url
-    } catch (e) {
-      console.log(e)
+      await this.setTextures()
+    } catch (error) {
+      this.SET_ERROR('Error while fetching homepage data')
     }
 
     this.appearCanvas()
-    this.ENABLE_ACTIVE_TITLE()
+    this.ENABLE_TITLE_ON_HOMEPAGE()
 
     this.webgl = useWebGL()
+    this.webgl.isRunning = true
+
+    setTimeout(() => {
+      this.webgl.isRunning = false
+    }, 2500)
+
+    this.webgl.textures = this.textures
     this.webgl.initFirstWebgl()
     this.webgl.updatePlaneCenteredPosition()
     this.webgl.updateFirstWebgl()
-    this.webgl.textures = this.textures
     this.webgl.imagesOptions = this.imagesOptions
-    // this.webgl.sizes = this.viewport
 
     window.addEventListener('wheel', this.onWheel)
   },
   async beforeDestroy() {
+    await this.webgl.startWebglTransition({ textures: '' })
     await window.removeEventListener('wheel', this.onWheel)
   },
   destroyed() {
@@ -186,8 +183,9 @@ export default {
       'SET_PROJECTS_ORDER',
       'DISABLE_PREVIOUS_TITLE',
       'DISABLE_ACTIVE_TITLE',
-      'ENABLE_PREVIOUS_TITLE',
       'ENABLE_ACTIVE_TITLE',
+      'ENABLE_TITLE_ON_HOMEPAGE',
+      'SET_ERROR',
     ]),
     onWheel(event) {
       if (this.webgl.isRunning) return
@@ -201,6 +199,13 @@ export default {
         this.ENABLE_ACTIVE_TITLE()
         this.DISABLE_PREVIOUS_TITLE()
       }
+    },
+    setTextures() {
+      this.textures.default = this.projects[0].image.url
+      this.textures.active =
+        this.activeProject === null
+          ? this.textures.default
+          : this.selectedProject?.image.url || this.textures.default
     },
     setImageOptions({ image }) {
       this.imagesOptions = {
