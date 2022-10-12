@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import { EffectPass, EffectComposer, RenderPass } from 'postprocessing'
 import { gsap, Power2 } from 'gsap'
-// import * as dat from 'dat.gui'
 
 import waterEffect from './utils/waterEffect'
 import { initTexture, addPoint, updatePoints } from './utils/touchTexture'
@@ -15,14 +14,14 @@ class WebGL {
       height: window.innerHeight,
       aspect: window.innerWidth / window.innerHeight,
     }
-    this.isRunning = false
+    this.isRunning = true
 
     this.textures = {
       previous: null,
       next: null,
       active: null,
       selected: null,
-      default: null,
+      default: 'images/cam-portfolio-project.jpeg',
     }
 
     this.imagesOptions = {
@@ -43,9 +42,13 @@ class WebGL {
     }
 
     this.setMousePosition({ waterEffectOptions: this.waterEffectOptions })
-  }
 
+    setTimeout(() => {
+      this.isRunning = false
+    }, 2500)
+  }
   // SETUP 3D SCENES
+
   initFirstWebgl() {
     this.waterTexture = initTexture()
     this.clock = new THREE.Clock()
@@ -167,14 +170,12 @@ class WebGL {
         texture1: {
           type: 'f',
           value: new THREE.TextureLoader().load(
-            'images/cam-portfolio-project.jpeg'
+            this.textures.active || this.textures.default
           ),
         },
         texture2: {
           type: 'f',
-          value: new THREE.TextureLoader().load(
-            'images/cam-portfolio-project.jpeg'
-          ),
+          value: new THREE.TextureLoader().load(this.textures.next),
         },
         displacement: {
           type: 'f',
@@ -347,6 +348,7 @@ class WebGL {
   updateFirstWebgl() {
     requestAnimationFrame(() => this.updateFirstWebgl())
 
+    this.plane.material.uniformsNeedUpdate = true
     this.camera.updateProjectionMatrix()
     this.composer.setSize(this.sizes.width, this.sizes.height)
     this.composer.render(this.clock.getDelta())
@@ -362,8 +364,7 @@ class WebGL {
       const uvScale = image.plane.material.uniforms.uvScale.value
       this.setProjectPlanesAspect({ imageAspect, planeAspect, uvScale })
       image.plane.position.set(this.offset.x, this.offset.y, 0)
-      // image.plane.scale.set(this.projectPlaneSizes.x, this.projectPlaneSizes.y, 1)
-      image.plane.material.uniformsNeedUpdate = true
+      // image.plane.material.uniformsNeedUpdate = true
     })
     this.camera2.updateProjectionMatrix()
     this.composer.setSize(this.sizes.width, this.sizes.height)
@@ -400,9 +401,10 @@ class WebGL {
         duration: 1.7,
         ease: Power2.easeInOut,
         onComplete: () => {
-          this.renderer.domElement.style.opacity = 0
-          // this.updatePlaneCenteredPosition()
-          // this.destroy({ renderer: this.renderer, scene: this.scene })
+          setTimeout(() => {
+            this.renderer.domElement.style.opacity = 0
+            this.destroy({ renderer: this.renderer, scene: this.scene })
+          }, 2000)
         },
       })
     } else {
@@ -412,29 +414,11 @@ class WebGL {
         duration: 1.7,
         ease: Power2.easeInOut,
         onComplete: () => {
-          this.renderer.domElement.style.opacity = 0
-          // this.updatePlaneCenteredPosition()
-          // this.destroy({ renderer: this.renderer, scene: this.scene })
+          setTimeout(() => {
+            this.renderer.domElement.style.opacity = 0
+            this.destroy({ renderer: this.renderer, scene: this.scene })
+          }, 2000)
         },
-      })
-    }
-  }
-
-  scaleDownPlaneCenteredPosition() {
-    const aspect = 1.25
-    if (this.imagesOptions.aspect > aspect) {
-      gsap.to(this.plane.scale, {
-        x: aspect / this.imagesOptions.aspect / 2.8,
-        y: 1 / 2.3,
-        duration: 1.7,
-        ease: Power2.easeInOut,
-      })
-    } else {
-      gsap.to(this.plane.scale, {
-        x: 1 / 2.3,
-        y: this.imagesOptions.aspect / aspect / 2.8,
-        duration: 1.7,
-        ease: Power2.easeInOut,
       })
     }
   }

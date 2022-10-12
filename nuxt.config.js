@@ -73,5 +73,12 @@ export default {
         ],
       ]
     },
+    extend(config) {
+      // ..
+      config.module.rules.push({
+        test: /\.(ttf|eot|svg|woff|otf(2)?)(\?[a-z0-9=&.]+)?$/,
+        loader: 'file-loader',
+      })
+    },
   },
 }
