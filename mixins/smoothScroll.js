@@ -1,12 +1,7 @@
 import LocomotiveScroll from 'locomotive-scroll'
-import { mapMutations, mapGetters } from 'vuex'
+import { mapMutations } from 'vuex'
 
 export default {
-  computed: {
-    ...mapGetters({
-      selectedProject: 'GET_SELECTED_PROJECT',
-    }),
-  },
   data() {
     return {
       scroll: null,
@@ -21,6 +16,11 @@ export default {
       smooth: true,
       offset: [10, 0],
       lerp: 0.1,
+    })
+
+    this.scroll.on('scroll', ({ scroll, limit }) => {
+      const progress = (scroll.y / limit.y) * 100
+      this.SET_SCROLL_INSTANCE({ progress })
     })
   },
   updated() {

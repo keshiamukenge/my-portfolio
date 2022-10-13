@@ -21,7 +21,7 @@ class WebGL {
       next: null,
       active: null,
       selected: null,
-      default: 'images/cam-portfolio-project.jpeg',
+      default: 'images/black-white/cam-portfolio-project.jpeg',
     }
 
     this.imagesOptions = {
@@ -47,8 +47,8 @@ class WebGL {
       this.isRunning = false
     }, 2500)
   }
-  // SETUP 3D SCENES
 
+  // SETUP 3D SCENES
   initFirstWebgl() {
     this.waterTexture = initTexture()
     this.clock = new THREE.Clock()

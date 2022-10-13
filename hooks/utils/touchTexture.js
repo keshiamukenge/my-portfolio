@@ -31,6 +31,7 @@ export function initTexture() {
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
   waterTexture = new THREE.Texture(canvas)
+  waterTexture.minFilter = THREE.LinearFilter
   canvas.id = 'touchTexture'
 
   return waterTexture

@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 import {
   ContainerFooter,
   FooterLink,
@@ -33,6 +35,9 @@ export default {
       default: '0',
     },
   },
+  ...mapGetters({
+    footerData: 'GET_FOOTER_DATA',
+  }),
   async mounted() {
     await this.$store.dispatch('fetchFooterData')
   },

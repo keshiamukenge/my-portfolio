@@ -10,6 +10,11 @@ const footerProps = {
   bottom: String,
 }
 
+const headerLinkProps = {
+  marginRight: Number,
+  opacity: String,
+}
+
 const containerStyle = () => {
   return `
 		width: 100vw;
@@ -27,6 +32,22 @@ const containerStyle = () => {
 export const ContainerHeader = styled.header`
   ${containerStyle}
   top: 0;
+
+  a:not(.nuxt-link-exact-active) {
+    span {
+      transition: 300ms linear;
+      opacity: 0.5;
+    }
+  }
+
+  a {
+    &:hover {
+      span {
+        transition: 300ms linear;
+        opacity: 1;
+      }
+    }
+  }
 `
 
 export const ContainerFooter = styled('footer', footerProps)`
@@ -34,11 +55,18 @@ export const ContainerFooter = styled('footer', footerProps)`
   bottom: ${(props) => props.bottom};
 `
 
-export const HeaderLink = styled.span`
+export const HeaderLink = styled('span', headerLinkProps)`
   display: inline-block;
   color: ${colors.white};
   font-family: ${fonts.bodyFont};
   text-transform: uppercase;
+  opacity: ${(props) => props.opacity};
+  margin-right: ${(props) => props.marginRight}px;
+`
+
+export const ContainerRightLinks = styled.div`
+  width: fit-content;
+  display: flex;
 `
 
 export const FooterLink = styled('a', footerLinkProps)`
