@@ -1,36 +1,41 @@
 <template>
   <ContainerHeader>
-    <NuxtLink
-      :to="
-        $store.state?.headerData?.homepage?.url
-          ? $store.state.headerData.homepage.url
-          : '/'
-      "
-    >
-      <HeaderLink @click="beforeGoHome">{{
-        $store.state?.headerData?.homepage?.label
+    <NuxtLink :to="headerData?.homepage?.url ? headerData.homepage.url : '/'">
+      <HeaderLink opacity="1!important" @click="beforeGoHome">{{
+        headerData?.homepage?.label
       }}</HeaderLink>
     </NuxtLink>
-    <NuxtLink
-      :to="
-        $store.state?.headerData?.about?.url
-          ? $store.state.headerData.about.url
-          : '/'
-      "
-    >
-      <HeaderLink @click="beforeGoAbout">{{
-        $store.state?.headerData?.about?.label
-      }}</HeaderLink>
-    </NuxtLink>
+    <ContainerRightLinks>
+      <NuxtLink :to="headerData?.works?.url ? headerData.works.url : '/'">
+        <HeaderLink :margin-right="10" @click="beforeGoAbout">
+          {{ headerData?.works?.label }},
+        </HeaderLink>
+      </NuxtLink>
+      <NuxtLink :to="headerData?.about?.url ? headerData?.about.url : '/'">
+        <HeaderLink @click="beforeGoAbout">{{
+          headerData?.about?.label
+        }}</HeaderLink>
+      </NuxtLink>
+    </ContainerRightLinks>
   </ContainerHeader>
 </template>
 
 <script>
-import { ContainerHeader, HeaderLink } from './styledComponents'
+import { mapGetters } from 'vuex'
+
+import {
+  ContainerHeader,
+  HeaderLink,
+  ContainerRightLinks,
+} from './styledComponents'
 
 export default {
   name: 'Header',
-  components: { ContainerHeader, HeaderLink },
+  components: {
+    ContainerHeader,
+    HeaderLink,
+    ContainerRightLinks,
+  },
   props: {
     beforeGoHome: {
       type: Function,
@@ -43,9 +48,14 @@ export default {
       default: () => {},
     },
   },
+  computed: {
+    ...mapGetters({
+      headerData: 'GET_HEADER_DATA',
+    }),
+  },
   async mounted() {
     await this.$store.dispatch('fetchHeaderData')
+    console.log(this.headerData)
   },
-  methods: {},
 }
 </script>

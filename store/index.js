@@ -17,16 +17,22 @@ export const state = {
     height: 0,
     aspect: 0,
   },
+  scroll: {
+    progress: 0,
+  },
   error: '',
 }
 
 export const getters = {
+  GET_HEADER_DATA: (state) => state.headerData,
+  GET_FOOTER_DATA: (state) => state.footerData,
   GET_PROJECTS_DATA: (state) => state.projectsData,
   GET_ACTIVE_PROJECT: (state) => state.projectsOrder.active,
   GET_PREVIOUS_PROJECT: (state) => state.projectsOrder.previous,
   GET_NEXT_PROJECT: (state) => state.projectsOrder.next,
   GET_SELECTED_PROJECT: (state) => state.selectedProject,
   GET_VIEWPORT: (state) => state.viewport,
+  GET_SCROLL_INSTANCE: (state) => state.scroll,
 }
 
 export const mutations = {
@@ -46,6 +52,9 @@ export const mutations = {
     state.viewport.width = window.innerWidth
     state.viewport.height = window.innerHeight
     state.viewport.aspect = window.innerWidth / window.innerHeight
+  },
+  SET_SCROLL_INSTANCE(state, { progress }) {
+    state.scroll = { progress }
   },
   SET_PROJECTS_ORDER(state, { direction }) {
     state.projectsOrder.previous = state.projectsData[state.activeId]
@@ -76,6 +85,14 @@ export const mutations = {
           : state.activeId - 1
       state.projectsOrder.active = state.projectsData[state.activeId]
       state.projectsOrder.next = state.projectsData[nextId]
+    }
+  },
+  SET_NEXT_SELECTED_PROJECT(state) {
+    if (state.selectedProject.id === state.projectsData.length - 1) {
+      state.projectsOrder.next = state.projectsData[0]
+    } else {
+      state.projectsOrder.next =
+        state.projectsData[state.selectedProject.id + 1]
     }
   },
   SET_SELECTED_PROJECT(state, { id }) {

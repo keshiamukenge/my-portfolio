@@ -9,7 +9,7 @@
         <NuxtLink :to="'/project/' + selectedProject.route">
           <ImageElement
             ref="images"
-            :src="project.image.url"
+            :src="project?.image?.blackWhite?.url"
             @click="() => SET_SELECTED_PROJECT({ id: activeProject?.id || 0 })"
           />
           <ProjectTitle>
@@ -132,10 +132,10 @@ export default {
     // eslint-disable-next-line object-shorthand
     activeProject: function () {
       this.textures = {
-        default: this.projects[0].image.url,
-        active: this.activeProject.image.url,
-        previous: this.previousProject.image.url,
-        next: this.nextProject.image.url,
+        default: this.projects[0].image.blackWhite?.url,
+        active: this.activeProject.image.blackWhite?.url,
+        previous: this.previousProject.image.blackWhite?.url,
+        next: this.nextProject.image.blackWhite?.url,
       }
       this.webgl.startWebglTransition({ textures: this.textures })
     },
@@ -201,11 +201,11 @@ export default {
       }
     },
     setTextures() {
-      this.textures.default = this.projects[0].image.url
+      this.textures.default = this.projects[0].image.blackWhite.url
       this.textures.active =
         this.activeProject === null
           ? this.textures.default
-          : this.selectedProject?.image.url || this.textures.default
+          : this.selectedProject?.image.blackWhite.url || this.textures.default
     },
     setImageOptions({ image }) {
       this.imagesOptions = {

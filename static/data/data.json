@@ -3,7 +3,11 @@
     "header": {
       "homepage": {
         "url": "/",
-        "label": "KM"
+        "label": "Keshia Mukenge"
+      },
+      "works": {
+        "url": "/",
+        "label": "works (3)"
       },
       "about": {
         "url": "/about",
@@ -32,7 +36,12 @@
       "type": "portfolio",
       "route": "portfolio-camille-gubian",
       "image": {
-        "url": "images/cam-portfolio-project.jpeg",
+        "blackWhite": {
+          "url": "images/black-white/cam-portfolio-project.jpeg"
+        },
+        "colors": {
+          "url": "images/colors/cam-portfolio-project.jpeg"
+        },
         "class": "img0",
         "width": 1280,
         "height": 1024
@@ -72,7 +81,7 @@
         },
         "technologies": {
           "label": "technologies",
-          "content": "VUEJS / CMS - PRISMIC"
+          "content": "NUXTJS, VUEJS, CMS - PRISMIC"
         },
         "description": {
           "title": "description",
@@ -92,7 +101,12 @@
       "type": "music band",
       "route": "soul-funk-factory",
       "image": {
-        "url": "images/sff-project.jpeg",
+        "blackWhite": {
+          "url": "images/black-white/sff-project.jpeg"
+        },
+        "colors": {
+          "url": "images/colors/sff-project.jpeg"
+        },
         "class": "img1",
         "width": 2857,
         "height": 4000
@@ -132,7 +146,7 @@
         },
         "technologies": {
           "label": "technologies",
-          "content": "VUEJS / CMS - PRISMIC"
+          "content": "NUXTJS, VUEJS, CMS - PRISMIC"
         },
         "description": {
           "title": "description",
@@ -152,7 +166,12 @@
       "type": "culture",
       "route": "out-of-school",
       "image": {
-        "url": "images/out-of-school-project.jpeg",
+        "blackWhite": {
+          "url": "images/black-white/out-of-school-project.jpeg"
+        },
+        "colors": {
+          "url": "images/colors/out-of-school-project.jpeg"
+        },
         "class": "img2",
         "width": 2731,
         "height": 4096
@@ -197,7 +216,7 @@
         },
         "technologies": {
           "label": "technologies",
-          "content": "REACTJS / CMS - PRISMIC"
+          "content": "REACTJS, CMS - PRISMIC"
         },
         "description": {
           "title": "description",

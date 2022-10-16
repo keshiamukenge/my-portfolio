@@ -1,6 +1,9 @@
 <template>
   <PageContainer ref="pageContainer" data-scroll>
     <MainContainer class="container-project-information">
+      <ContainerImageWebsiteIntro>
+        <DefaultImage :src="selectedProject?.image?.colors?.url" />
+      </ContainerImageWebsiteIntro>
       <ContainerProjectInformationsSection>
         <ContainerProjectInformationsIntroduction>
           <ProjectTitle>
@@ -14,6 +17,7 @@
                 split-characters="words"
                 :font="titleFont"
                 :duration="0.8"
+                delay="0.8"
                 :animation="1"
               />
             </intersect>
@@ -37,6 +41,7 @@
                     :font="bodyFont"
                     :duration="0.5"
                     :animation="3"
+                    delay="0.8"
                   />
                 </intersect>
               </Subtitle>
@@ -51,7 +56,7 @@
                     :reveal="revealProjectPart.firstSection"
                     :font="bodyFont"
                     :duration="1"
-                    delay="<10%"
+                    delay="0.8"
                   />
                 </intersect>
               </Informations>
@@ -72,6 +77,7 @@
                     :font="bodyFont"
                     :duration="0.5"
                     :animation="3"
+                    delay="0.8"
                   />
                 </intersect>
               </Subtitle>
@@ -86,7 +92,7 @@
                     :reveal="revealProjectPart.secondSection"
                     :font="bodyFont"
                     :duration="1"
-                    delay="<10%"
+                    delay="0.8"
                   />
                 </intersect>
               </Informations>
@@ -107,6 +113,7 @@
                     :font="bodyFont"
                     :duration="0.5"
                     :animation="3"
+                    delay="0.8"
                   />
                 </intersect>
               </Subtitle>
@@ -117,7 +124,7 @@
                   :reveal="revealProjectPart.thirdSection"
                   :font="bodyFont"
                   :duration="1"
-                  delay="<10%"
+                  delay="0.8"
                 />
               </Informations>
             </ContainerProjectInformations>
@@ -137,6 +144,7 @@
                     :font="bodyFont"
                     :duration="0.5"
                     :animation="3"
+                    delay="0.8"
                   />
                 </intersect>
               </Subtitle>
@@ -151,7 +159,7 @@
                     :reveal="revealProjectPart.fourthSection"
                     :font="bodyFont"
                     :duration="1"
-                    delay="<10%"
+                    delay="0.8"
                   />
                 </intersect>
               </Informations>
@@ -172,6 +180,7 @@
                     :font="bodyFont"
                     :duration="0.5"
                     :animation="3"
+                    delay="0.8"
                   />
                 </intersect>
               </Subtitle>
@@ -186,7 +195,7 @@
                     :reveal="revealProjectPart.fiveSection"
                     :font="bodyFont"
                     :duration="1"
-                    delay="<10%"
+                    delay="0.8"
                   />
                 </intersect>
               </Informations>
@@ -200,6 +209,9 @@
           </ContainerImageWebsite>
         </ContainerProjectInformationsContent>
       </ContainerProjectInformationsSection>
+      <ContainerNextProjectImage ref="imageNextProject">
+        <DefaultImage :src="nextProject?.image?.colors?.url" />
+      </ContainerNextProjectImage>
     </MainContainer>
   </PageContainer>
 </template>
@@ -225,6 +237,9 @@ import {
   ContainerProjectInformationsContent,
   ContainerImageWebsite,
   ImageElement,
+  ContainerNextProjectImage,
+  DefaultImage,
+  ContainerImageWebsiteIntro,
 } from './styledComponents'
 import smoothScroll from '~/mixins/smoothScroll'
 
@@ -246,6 +261,9 @@ export default {
     Paragraph,
     ContainerProjectInformationsIntroduction,
     ContainerProjectInformationsContent,
+    ContainerNextProjectImage,
+    DefaultImage,
+    ContainerImageWebsiteIntro,
   },
   mixins: [smoothScroll],
   transition: {
@@ -283,6 +301,8 @@ export default {
         aspect: 0,
       },
       imagesWebsite: [],
+      scroll: null,
+      isRunning: false,
     }
   },
   computed: {
@@ -293,6 +313,7 @@ export default {
       nextProject: 'GET_NEXT_PROJECT',
       selectedProject: 'GET_SELECTED_PROJECT',
       viewport: 'GET_VIEWPORT',
+      scrollInstance: 'GET_SCROLL_INSTANCE',
     }),
   },
   watch: {
@@ -301,6 +322,17 @@ export default {
       this.webgl.imagesOptions.aspect =
         this.selectedProject.image.width / this.selectedProject.image.height
     },
+    '$store.state.scroll'() {
+      if (this.$store.state.scroll.progress === 100) {
+        document.body.style.cursor = 'progress'
+        // this.nextProjectImageAnimation()
+        setTimeout(() => {
+          this.navigateToNextProject()
+        }, 1000)
+      } else {
+        document.body.style.cursor = 'default'
+      }
+    },
   },
   async mounted() {
     try {
@@ -308,6 +340,8 @@ export default {
     } catch (e) {
       this.SET_ERROR('Error while fetching project data')
     }
+
+    this.SET_NEXT_SELECTED_PROJECT()
 
     this.pageContainer = this.$refs.pageContainer.$el
     this.appearCanvas()
@@ -324,7 +358,12 @@ export default {
     })
   },
   methods: {
-    ...mapMutations(['DISABLE_ACTIVE_TITLE', 'SET_ERROR']),
+    ...mapMutations([
+      'DISABLE_ACTIVE_TITLE',
+      'SET_ERROR',
+      'SET_SELECTED_PROJECT',
+      'SET_NEXT_SELECTED_PROJECT',
+    ]),
     // INTERACTIONS
     appearProjectInformations() {
       gsap.to(this.pageContainer, {
@@ -336,7 +375,7 @@ export default {
       const canvas = document.querySelector('canvas.second-webgl')
       gsap.to(canvas, {
         opacity: 1,
-        duration: 0.5,
+        duration: 0.8,
       })
     },
     addImageToWebgl() {
@@ -346,6 +385,13 @@ export default {
       })
       refs.forEach((ref) => {
         this.imagesWebsite.push(this.$refs[ref][0].$el)
+      })
+    },
+    nextProjectImageAnimation() {
+      gsap.to(this.$refs.imageNextProject.$el, {
+        duration: 0.5,
+        height: 50 + 'vh',
+        ease: Power2.easeInOut,
       })
     },
     async initWebgl2() {
@@ -358,6 +404,12 @@ export default {
       this.webgl.updateSecondWebgl({
         images: this.imagesWebsite,
       })
+    },
+    navigateToNextProject() {
+      this.$router.push({
+        path: `/project/${this.nextProject.route}`,
+      })
+      this.SET_SELECTED_PROJECT({ id: this.nextProject.id })
     },
   },
 }
