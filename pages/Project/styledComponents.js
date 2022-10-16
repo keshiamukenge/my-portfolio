@@ -68,6 +68,22 @@ export const ContainerImageWebsite = styled.div`
   margin: 3rem 2rem 0 0;
 `
 
+export const ContainerImageWebsiteIntro = styled.div`
+  width: 100wh;
+  height: 50vh;
+`
+
+export const ContainerNextProjectImage = styled.div`
+  width: 100vw;
+  height: 100vh;
+`
+
+export const DefaultImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`
+
 export const ContainerProjectInformationsContent = styled.div`
   width: 100%;
   height: fit-content;
